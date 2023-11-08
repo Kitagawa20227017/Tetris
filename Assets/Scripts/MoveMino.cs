@@ -17,6 +17,7 @@ public class MoveMino : MonoBehaviour
     private Transform _parentTransform; // 子オブジェクト取得用
 
     private float _time = 0;
+    private string _minoTypeRecord;
 
     public enum Mino
     {
@@ -29,7 +30,7 @@ public class MoveMino : MonoBehaviour
         ZMino
     }
 
-    [SerializeField] private Mino _mino;
+    [SerializeField] private Mino _minoType;
 
     #endregion
 
@@ -43,6 +44,7 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Awake()
     {
+        _minoTypeRecord = _minoType.ToString();
         _mapObj = GameObject.Find("Map").gameObject;
         _updateMap = GameObject.Find("Map").GetComponent<UpdateMinoMap>();
         _parentTransform = this.gameObject.transform;
@@ -96,7 +98,11 @@ public class MoveMino : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            
+            switch (_minoTypeRecord)
+            {
+                case "LMino":
+                    break;
+            }
         }
         else if(Input.GetKeyDown(KeyCode.D))
         {
@@ -174,6 +180,11 @@ public class MoveMino : MonoBehaviour
             }
         }
         return isMinoMove;
+    }
+
+    private void LMinoLeft()
+    {
+
     }
 
     #endregion
