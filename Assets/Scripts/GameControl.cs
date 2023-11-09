@@ -42,6 +42,7 @@ public class GameControl : MonoBehaviour
     /// </summary>  
     void Update ()
     {
+        Debug.Log(_updateMap.Map[22,6]);
         _updateMap.SearchMino();
     }
 
