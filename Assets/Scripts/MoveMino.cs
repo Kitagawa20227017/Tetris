@@ -1,6 +1,6 @@
 // ---------------------------------------------------------  
 // PlayerInput.cs  
-//   
+// プレイヤーに入力処理及びそれに伴うミノの挙動変化  
 // 作成日:  2023/11/2
 // 作成者:  北川稔明
 // ---------------------------------------------------------  
@@ -19,7 +19,9 @@ public class MoveMino : MonoBehaviour
     private float _time = 0;
     private string _minoTypeRecord;
 
-    public enum Mino
+    private Transform aa;
+
+    private enum Mino
     {
         OMino,
         TMino,
@@ -75,17 +77,17 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Update ()
     {
-        if (!DownMove())
-        { 
-            while (gameObject.transform.childCount != 0)
-            {
-                foreach (Transform chlid in _parentTransform)
-                {
-                    chlid.gameObject.transform.parent = _mapObj.transform;
-                }
-            }
-            gameObject.SetActive(false);
-        }
+        //if (!DownMove())
+        //{ 
+        //    while (gameObject.transform.childCount != 0)
+        //    {
+        //        foreach (Transform chlid in _parentTransform)
+        //        {
+        //            chlid.gameObject.transform.parent = _mapObj.transform;
+        //        }
+        //    }
+        //    gameObject.SetActive(false);
+        //}
 
         if (Input.GetKeyDown(KeyCode.RightArrow) && RightMove())
         {
@@ -126,7 +128,7 @@ public class MoveMino : MonoBehaviour
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
 
-            if(_updateMap.Map[verticalAxis,horizontalAxis + 1] == 0)
+            if(horizontalAxis <= 23 && _updateMap.Map[verticalAxis,horizontalAxis + 1] == 0)
             {
                 isMinoMove = true;
             }
@@ -150,7 +152,7 @@ public class MoveMino : MonoBehaviour
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
 
-            if (_updateMap.Map[verticalAxis, horizontalAxis -1] == 0)
+            if (horizontalAxis >= 1 && _updateMap.Map[verticalAxis, horizontalAxis -1] == 0)
             {
                 isMinoMove = true;
             }
