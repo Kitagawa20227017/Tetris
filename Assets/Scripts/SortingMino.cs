@@ -1,18 +1,20 @@
 // ---------------------------------------------------------  
-// GameControl.cs  
+// SortingMino.cs  
 //   
-// 作成日:  2023/10/24
-// 作成者:  北川稔明
+// 作成日:  2023/11/16
+// 作成者:  
 // ---------------------------------------------------------  
 using UnityEngine;
 using System.Collections;
 
-public class GameControl : MonoBehaviour
+public class SortingMino : MonoBehaviour
 {
 
     #region 変数  
 
-    private UpdateMinoMap _updateMap;
+    [SerializeField] private GameObject[] _minoObjs = default;
+    private Transform _parentTransform; // 子オブジェクト取得用
+    int a = 0;
 
     #endregion
 
@@ -26,7 +28,6 @@ public class GameControl : MonoBehaviour
     /// </summary>  
     void Awake()
     {
-        _updateMap = GameObject.Find("Map").GetComponent<UpdateMinoMap>();
     }
      
     /// <summary>  
@@ -34,7 +35,6 @@ public class GameControl : MonoBehaviour
     /// </summary>  
     void Start ()
     {
-        _updateMap.SearchMino();
     }
 
     /// <summary>  
@@ -42,7 +42,14 @@ public class GameControl : MonoBehaviour
     /// </summary>  
     void Update ()
     {
-        _updateMap.SearchMino();
+        if(gameObject.transform.childCount == 0)
+        {
+            Debug.Log("A");
+        }
+        else
+        {
+            Debug.Log(gameObject.transform.childCount);
+        }
     }
 
     #endregion

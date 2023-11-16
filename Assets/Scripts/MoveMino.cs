@@ -16,10 +16,8 @@ public class MoveMino : MonoBehaviour
     private UpdateMinoMap _updateMap;
     private Transform _parentTransform; // 子オブジェクト取得用
 
-    private float _time = 0;
+    private float _downMinoTimer = 0;
     private string _minoTypeRecord;
-
-    private Transform aa;
 
     private enum Mino
     {
@@ -61,15 +59,6 @@ public class MoveMino : MonoBehaviour
 
     private void FixedUpdate()
     {
-        _time += Time.deltaTime;
-        if(_time >= 1)
-        {
-            //if(DownMove())
-            //{
-            //    gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - 1);
-            //}
-            _time = 0;
-        }
     }
 
     /// <summary>  
@@ -77,17 +66,19 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Update ()
     {
-        //if (!DownMove())
-        //{ 
-        //    while (gameObject.transform.childCount != 0)
-        //    {
-        //        foreach (Transform chlid in _parentTransform)
-        //        {
-        //            chlid.gameObject.transform.parent = _mapObj.transform;
-        //        }
-        //    }
-        //    gameObject.SetActive(false);
-        //}
+        _downMinoTimer += Time.deltaTime;
+        if (_downMinoTimer >= 1)
+        {
+            if (DownMove())
+            {
+                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - 1);
+            }
+            else
+            {
+                StopMino();
+            }
+            _downMinoTimer = 0;
+        }
 
         if (Input.GetKeyDown(KeyCode.RightArrow) && RightMove())
         {
@@ -198,7 +189,7 @@ public class MoveMino : MonoBehaviour
             // 見つけた子オブジェクトのローカル座標を保存
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
-            if (_updateMap.Map[verticalAxis , horizontalAxis] == 0)
+            if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 && verticalAxis <= 22 &&_updateMap.Map[verticalAxis , horizontalAxis] == 0)
             {
                 isMinoMove = true;
             }
@@ -209,6 +200,18 @@ public class MoveMino : MonoBehaviour
             }
         }
         return isMinoMove;
+    }
+
+    private void StopMino()
+    {
+        while (gameObject.transform.childCount != 0)
+        {
+            foreach (Transform chlid in _parentTransform)
+            {
+                chlid.gameObject.transform.parent = _mapObj.transform;
+            }
+        }
+        gameObject.SetActive(false);
     }
 
     #endregion

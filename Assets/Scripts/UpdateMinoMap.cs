@@ -67,11 +67,12 @@ public class UpdateMinoMap : MonoBehaviour
         bool isDestory = false; // 削除できるかどうかのフラグ
 
         // 削除出来る列を探索する処理
-        for (int i = Map.GetLength(0) - 1; i > 0; i--) // 一番下の列は、外壁なのでその一つ上から始める
-        {
-            for (int j = 1; j < Map.GetLength(1) - 2; j++) // 一つ右を見るので外壁+一番左のミノ分引いた位置まで見る また一番右は、外壁なので１スタート
+        for (int i = Map.GetLength(0) - 1; i > 0; i--){ // 一番下の列は、外壁なのでその一つ上から始める
+            // 一つ右を見るので外壁+一番左のミノ分引いた位置まで見る また一番右は、外壁なので１スタート
+            for (int j = 1; j < Map.GetLength(1) - 2; j++)
             {
-                if (Map[i, j] == 1 && Map[i, j] == Map[i, j + 1]) // 現在の位置から一つ右を見てミノだったら次を調べる
+                // 現在の位置から一つ右を見てミノだったら次を調べる
+                if (Map[i, j] == 1 && Map[i, j] == Map[i, j + 1])
                 {
                     isDestory = true;
                 }
@@ -111,7 +112,7 @@ public class UpdateMinoMap : MonoBehaviour
                 if (chlid.transform.localPosition.y == -destoryMinoLine[j] && chlid.tag == "Mino") 
                 {
                     Map[verticalAxis, horizontalAxis] = 0;
-                    Destroy(chlid.gameObject);
+                    chlid.gameObject.SetActive(false);
                 }
             }
         }
