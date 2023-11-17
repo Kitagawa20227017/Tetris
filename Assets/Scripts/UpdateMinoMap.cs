@@ -13,13 +13,17 @@ public class UpdateMinoMap : MonoBehaviour
 
     #region 変数  
 
-    private Transform _parentTransform; // 子オブジェクト取得用
+    private Transform _parentTransform = default; // 子オブジェクト取得用
     private int[,] _map = new int[24, 12]; // 盤面の格納用
 
     #endregion
 
     #region プロパティ 
-    public int[,] Map { get => _map; set => _map = value; }
+    public int[,] Map 
+    { 
+        get => _map; 
+        set => _map = value; 
+    }
 
     #endregion
 
@@ -28,13 +32,19 @@ public class UpdateMinoMap : MonoBehaviour
     /// <summary>  
     /// 初期化処理  
     /// </summary>  
-    void Awake()
+    private void Awake()
     {
-        _parentTransform = this.gameObject.transform; 
+        _parentTransform = this.gameObject.transform;
+        SearchMino();
+    }
+
+    private void Update()
+    {
+        SearchMino();
     }
 
     // ミノの更新
-    public void SearchMino()
+    private void SearchMino()
     {
         foreach (Transform chlid in _parentTransform)
         {

@@ -1,6 +1,8 @@
 // ---------------------------------------------------------  
-// PlayerInput.cs  
-// プレイヤーに入力処理及びそれに伴うミノの挙動変化  
+// PlayerInput.cs
+// 
+// プレイヤーに入力処理及びそれに伴うミノの挙動変化
+// 
 // 作成日:  2023/11/2
 // 作成者:  北川稔明
 // ---------------------------------------------------------  
@@ -12,12 +14,11 @@ public class MoveMino : MonoBehaviour
 
     #region 変数  
 
-    private GameObject _mapObj;
-    private UpdateMinoMap _updateMap;
-    private Transform _parentTransform; // 子オブジェクト取得用
+    private GameObject _mapObj = default;
+    private UpdateMinoMap _updateMap = default;
+    private Transform _parentTransform = default; // 子オブジェクト取得用
 
     private float _downMinoTimer = 0;
-    private string _minoTypeRecord;
 
     private enum Mino
     {
@@ -44,7 +45,6 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Awake()
     {
-        _minoTypeRecord = _minoType.ToString();
         _mapObj = GameObject.Find("Map").gameObject;
         _updateMap = GameObject.Find("Map").GetComponent<UpdateMinoMap>();
         _parentTransform = this.gameObject.transform;
@@ -54,10 +54,6 @@ public class MoveMino : MonoBehaviour
     /// 更新前処理  
     /// </summary>  
     void Start ()
-    {
-    }
-
-    private void FixedUpdate()
     {
     }
 
@@ -80,16 +76,16 @@ public class MoveMino : MonoBehaviour
             _downMinoTimer = 0;
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow) && RightMove())
+        if (Input.GetKeyDown(KeyCode.RightArrow) && RotationMino())
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + 1, gameObject.transform.localPosition.y);
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) && LeftMove())
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) && RotationMino())
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - 1, gameObject.transform.localPosition.y);
         }
 
-        if (Input.GetKeyDown(KeyCode.A) && _minoTypeRecord != "OMino")
+        if (Input.GetKeyDown(KeyCode.A))
         {
             gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0,0,-90);
             if (!MinoRevolution())
@@ -97,7 +93,7 @@ public class MoveMino : MonoBehaviour
                 gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
             }
         }
-        else if(Input.GetKeyDown(KeyCode.D) && _minoTypeRecord != "OMino")
+        else if(Input.GetKeyDown(KeyCode.D))
         {
             gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
             if (!MinoRevolution())
@@ -108,7 +104,7 @@ public class MoveMino : MonoBehaviour
 
     }
 
-    private bool RightMove()
+    private bool RotationMino()
     {
         bool isMinoMove = false;
         foreach (Transform chlid in _parentTransform)
@@ -119,31 +115,8 @@ public class MoveMino : MonoBehaviour
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
 
-            if(horizontalAxis <= 23 && _updateMap.Map[verticalAxis,horizontalAxis + 1] == 0)
-            {
-                isMinoMove = true;
-            }
-            else
-            {
-                isMinoMove = false;
-                break;
-            }
-        }
-        return isMinoMove;
-    }
-
-    private bool LeftMove()
-    {
-        bool isMinoMove = false;
-        foreach (Transform chlid in _parentTransform)
-        {
-            isMinoMove = false;
-            Vector3 localMinoPos = transform.root.gameObject.transform.InverseTransformPoint(chlid.gameObject.transform.position);
-            // 見つけた子オブジェクトのローカル座標を保存
-            int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
-            int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
-
-            if (horizontalAxis >= 1 && _updateMap.Map[verticalAxis, horizontalAxis -1] == 0)
+            if(horizontalAxis <= 23 && _updateMap.Map[verticalAxis,horizontalAxis + 1] == 0 && 
+                horizontalAxis >= 1 && _updateMap.Map[verticalAxis, horizontalAxis - 1] == 0)
             {
                 isMinoMove = true;
             }

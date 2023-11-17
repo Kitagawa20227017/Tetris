@@ -13,7 +13,7 @@ public class SortingMino : MonoBehaviour
     #region 変数  
 
     [SerializeField] private GameObject[] _minoObjs = default;
-    private Transform _parentTransform; // 子オブジェクト取得用
+    private Transform _parentTransform = default; // 子オブジェクト取得用
     int a = 0;
 
     #endregion
@@ -42,14 +42,7 @@ public class SortingMino : MonoBehaviour
     /// </summary>  
     void Update ()
     {
-        if(gameObject.transform.childCount == 0)
-        {
-            Debug.Log("A");
-        }
-        else
-        {
-            Debug.Log(gameObject.transform.childCount);
-        }
+        
     }
 
     #endregion
