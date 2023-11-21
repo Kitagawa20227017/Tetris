@@ -55,6 +55,7 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Start ()
     {
+
     }
 
     /// <summary>  
@@ -62,6 +63,7 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Update ()
     {
+        Debug.Log(RotationMino());
         _downMinoTimer += Time.deltaTime;
         if (_downMinoTimer >= 1)
         {
@@ -115,8 +117,8 @@ public class MoveMino : MonoBehaviour
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
 
-            if(horizontalAxis <= 23 && _updateMap.Map[verticalAxis,horizontalAxis + 1] == 0 && 
-                horizontalAxis >= 1 && _updateMap.Map[verticalAxis, horizontalAxis - 1] == 0)
+            if((horizontalAxis <= 23 && _updateMap.Map[verticalAxis,horizontalAxis + 1] == 0) || 
+                (horizontalAxis >= 1 && _updateMap.Map[verticalAxis, horizontalAxis - 1] == 0))
             {
                 isMinoMove = true;
             }
