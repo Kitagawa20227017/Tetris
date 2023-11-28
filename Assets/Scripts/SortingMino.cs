@@ -18,7 +18,7 @@ public class SortingMino : MonoBehaviour
     private List<int> _randomList = new List<int>();
     private Vector2 _evenNumberSidePos = new Vector2(10.5f,8.5f);
     private Vector2 _oddNumberSidePos = new Vector2(10f, 8);
-    private Vector2 _tMinoPos = new Vector2(5f, 1);
+    private Vector2 _tMinoPos = new Vector2(10f, 9f);
 
     int _indexArray = 0;
 
@@ -73,7 +73,10 @@ public class SortingMino : MonoBehaviour
 
     private void aaa()
     {
-        Debug.Log("test :" + _mino[_indexArray]);
+        for(int i = 0; i < _mino.Length; i++)
+        {
+            Debug.Log("test" + i + " : " + _mino[i]);
+        }
         if(_mino[_indexArray] == 1 || _mino[_indexArray] == 0)
         {
             Instantiate(_minoObjs[_mino[_indexArray]],_evenNumberSidePos, Quaternion.identity, this.transform);
@@ -87,6 +90,7 @@ public class SortingMino : MonoBehaviour
         else if(_mino[_indexArray] == 2)
         {
             Instantiate(_minoObjs[_mino[_indexArray]],_tMinoPos, Quaternion.identity, this.transform);
+            _indexArray++;
             if (_indexArray >= 7)
             {
                 _indexArray = 0;
@@ -96,6 +100,7 @@ public class SortingMino : MonoBehaviour
         else
         {
             Instantiate(_minoObjs[_mino[_indexArray]], _oddNumberSidePos, Quaternion.identity, this.transform);
+            _indexArray++;
             if (_indexArray >= 7)
             {
                 _indexArray = 0;

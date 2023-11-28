@@ -14,6 +14,9 @@ public class MoveMino : MonoBehaviour
 
     #region 変数  
 
+    private const string _RIGHTMOVEMINO = "Right";
+    private const string _LEFTMOVEMINO = "Left";
+
     private GameObject _mapObj = default;
     private UpdateMinoMap _updateMap = default;
     private Transform _parentTransform = default; // 子オブジェクト取得用
@@ -63,7 +66,6 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Update ()
     {
-        Debug.Log(RotationMino());
         _downMinoTimer += Time.deltaTime;
         if (_downMinoTimer >= 1)
         {
@@ -78,11 +80,11 @@ public class MoveMino : MonoBehaviour
             _downMinoTimer = 0;
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow) && RotationMino())
+        if (Input.GetKeyDown(KeyCode.RightArrow) && RotationMino(_RIGHTMOVEMINO))
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + 1, gameObject.transform.localPosition.y);
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) && RotationMino())
+        else if (Input.GetKeyDown(KeyCode.LeftArrow) && RotationMino(_LEFTMOVEMINO))
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - 1, gameObject.transform.localPosition.y);
         }
@@ -103,10 +105,9 @@ public class MoveMino : MonoBehaviour
                 gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
             }
         }
-
     }
 
-    private bool RotationMino()
+    private bool RotationMino(string moveDirection)
     {
         bool isMinoMove = false;
         foreach (Transform chlid in _parentTransform)
@@ -117,15 +118,29 @@ public class MoveMino : MonoBehaviour
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
 
-            if((horizontalAxis <= 23 && _updateMap.Map[verticalAxis,horizontalAxis + 1] == 0) || 
-                (horizontalAxis >= 1 && _updateMap.Map[verticalAxis, horizontalAxis - 1] == 0))
+            if(moveDirection == _RIGHTMOVEMINO)
             {
-                isMinoMove = true;
+                if (horizontalAxis <= 23 && _updateMap.Map[verticalAxis, horizontalAxis + 1] == 0)
+                {
+                    isMinoMove = true;
+                }
+                else
+                {
+                    isMinoMove = false;
+                    break;
+                }
             }
-            else
+            else if(moveDirection == _LEFTMOVEMINO)
             {
-                isMinoMove = false;
-                break;
+                if (horizontalAxis >= 1 && _updateMap.Map[verticalAxis, horizontalAxis - 1] == 0)
+                {
+                    isMinoMove = true;
+                }
+                else
+                {
+                    isMinoMove = false;
+                    break;
+                }
             }
         }
         return isMinoMove;
@@ -186,6 +201,7 @@ public class MoveMino : MonoBehaviour
                 chlid.gameObject.transform.parent = _mapObj.transform;
             }
         }
+        gameObject.transform.parent = _mapObj.transform;
         gameObject.SetActive(false);
     }
 
