@@ -14,15 +14,16 @@ public class MoveMino : MonoBehaviour
 
     #region 変数  
 
-    private const string _RIGHTMOVEMINO = "Right";
-    private const string _LEFTMOVEMINO = "Left";
+    private const string _RIGHTMOVEMINO = "Right"; // 右方向の移動指標
+    private const string _LEFTMOVEMINO = "Left";   // 左方向の移動指標
 
-    private GameObject _mapObj = default;
-    private UpdateMinoMap _updateMap = default;
-    private Transform _parentTransform = default; // 子オブジェクト取得用
+    private GameObject _mapObj = default;          // Mapオブジェクト取得用
+    private UpdateMinoMap _updateMap = default;    // UpdateMinoMapスクリプト取得用
+    private Transform _parentTransform = default;  // 子オブジェクト取得用
 
-    private float _downMinoTimer = 0;
+    private float _downMinoTimer = 0;　　　　　　　// ミノの落ちてくる時間を測るタイマー
 
+    // ミノの形の識別
     private enum Mino
     {
         OMino,
@@ -34,7 +35,7 @@ public class MoveMino : MonoBehaviour
         ZMino
     }
 
-    [SerializeField] private Mino _minoType;
+    [SerializeField] private Mino _minoType; // 選択できるようにする
 
     #endregion
 
@@ -48,6 +49,7 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Awake()
     {
+        // オブジェクト、スクリプトの取得、格納
         _mapObj = GameObject.Find("Map").gameObject;
         _updateMap = GameObject.Find("Map").GetComponent<UpdateMinoMap>();
         _parentTransform = this.gameObject.transform;
@@ -66,7 +68,7 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Update ()
     {
-        _downMinoTimer += Time.deltaTime;
+        _downMinoTimer += Time.deltaTime; // 時間を測る
         if (_downMinoTimer >= 1)
         {
             if (DownMove())
@@ -176,9 +178,11 @@ public class MoveMino : MonoBehaviour
         {
             isMinoMove = false;
             Vector3 localMinoPos = transform.root.gameObject.transform.InverseTransformPoint(chlid.gameObject.transform.position);
+
             // 見つけた子オブジェクトのローカル座標を保存
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
+
             if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 && verticalAxis <= 22 &&_updateMap.Map[verticalAxis , horizontalAxis] == 0)
             {
                 isMinoMove = true;

@@ -18,8 +18,11 @@ public class UpdateMinoMap : MonoBehaviour
     private const string MINOOBJTAG = "Mino";
     private const string WALLOBJTAG = "Wall";
 
+    private DeletionObj _deletionObj;
     private GameObject[] _des;
     private Transform _parentTransform = default; // 子オブジェクト取得用
+
+    private int _desIndex = default;
     private int[,] _map = new int[24, 12]; // 盤面の格納用
 
     #endregion
@@ -40,7 +43,11 @@ public class UpdateMinoMap : MonoBehaviour
     /// </summary>  
     private void Awake()
     {
+        // オブジェクト、スクリプトの取得、格納
+        _deletionObj = GameObject.Find("DeleteObjs").GetComponent<DeletionObj>();
         _parentTransform = this.gameObject.transform;
+
+        // マップの初期設定
         SearchMino();
     }
 
@@ -100,6 +107,7 @@ public class UpdateMinoMap : MonoBehaviour
             }
             if (isDestory) // 削除出来る列があったときその列を記録する
             {
+                _desIndex += 10;
                 destoryMinoLine[countDestoryMino] = i; // 列の記録
                 countDestoryMino++; // 配列を1つ進める
             }
@@ -107,8 +115,6 @@ public class UpdateMinoMap : MonoBehaviour
 
         if (destoryMinoLine[0] != -1) // 削除出来る列があるときだけ削除処理を呼ぶ
         {
-            _des = new GameObject[countDestoryMino * 10];
-            Debug.Log(_des.Length);
             DeletionMino(destoryMinoLine);
             DownMino(destoryMinoLine);
         }
@@ -120,6 +126,7 @@ public class UpdateMinoMap : MonoBehaviour
     /// <param name="destoryMinoLine"></param>
     private void DeletionMino(int[] destoryMinoLine)
     {
+        _des = new GameObject[_desIndex];
         int n = 0;
         foreach (Transform chlid in _parentTransform) // 子オブジェクトを取得
         {
@@ -140,10 +147,13 @@ public class UpdateMinoMap : MonoBehaviour
             }
         }
 
+        // 別オブジェクトを親に設定する
         for(int i = 0; i < _des.Length; i++)
         {
             _des[i].transform.parent = _destoyObj.transform;
         }
+
+        _deletionObj.DestyoyObj();
     }
 
     /// <summary>

@@ -13,7 +13,6 @@ public class SortingMino : MonoBehaviour
     #region 変数  
 
     [SerializeField] private GameObject[] _minoObjs = default;
-    private Transform _parentTransform = default; // 子オブジェクト取得用
     private int[] _mino = { 0, 0, 0, 0, 0, 0, 0, };
     private List<int> _randomList = new List<int>();
     private Vector2 _evenNumberSidePos = new Vector2(10.5f,8.5f);
@@ -73,10 +72,6 @@ public class SortingMino : MonoBehaviour
 
     private void aaa()
     {
-        for(int i = 0; i < _mino.Length; i++)
-        {
-            Debug.Log("test" + i + " : " + _mino[i]);
-        }
         if(_mino[_indexArray] == 1 || _mino[_indexArray] == 0)
         {
             Instantiate(_minoObjs[_mino[_indexArray]],_evenNumberSidePos, Quaternion.identity, this.transform);
