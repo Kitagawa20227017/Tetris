@@ -82,6 +82,11 @@ public class MoveMino : MonoBehaviour
             _downMinoTimer = 0;
         }
 
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            HardDorp();
+        }
+
         if (Input.GetKeyDown(KeyCode.RightArrow) && RotationMino(_RIGHTMOVEMINO))
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + 1, gameObject.transform.localPosition.y);
@@ -93,18 +98,18 @@ public class MoveMino : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0,0,-90);
-            if (!MinoRevolution())
-            {
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
-            }
+            //gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0,0,90);
+            //if (!MinoRevolution(_LEFTMOVEMINO))
+            //{
+            //    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+            //}
         }
         else if(Input.GetKeyDown(KeyCode.D))
         {
-            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
-            if (!MinoRevolution())
+            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+            if (!MinoRevolution(_RIGHTMOVEMINO))
             {
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
             }
         }
     }
@@ -171,9 +176,52 @@ public class MoveMino : MonoBehaviour
         return isMinoMove;
     }
 
-    private bool MinoRevolution()
+    private void HardDorp()
     {
         bool isMinoMove = false;
+        foreach (Transform chlid in _parentTransform)
+        {
+            isMinoMove = false;
+            Vector3 localMinoPos = transform.root.gameObject.transform.InverseTransformPoint(chlid.gameObject.transform.position);
+            // 見つけた子オブジェクトのローカル座標を保存
+            int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
+            int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
+            if (_updateMap.Map[verticalAxis + 1, horizontalAxis] == 0)
+            {
+                isMinoMove = true;
+            }
+            else
+            {
+                isMinoMove = false;
+                break;
+            }
+        }
+
+        if(isMinoMove)
+        {
+            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - 1);
+            HardDorp();
+        }
+        else
+        {
+            Debug.Log(gameObject.transform.localPosition);
+        }
+    }
+
+    private bool MinoRevolution(string moveDirection)
+    {
+        bool isMinoMove = false;
+
+        if (moveDirection == _RIGHTMOVEMINO)
+        {
+            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
+        }
+        else if (moveDirection == _LEFTMOVEMINO)
+        {
+            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+        }
+
+
         foreach (Transform chlid in _parentTransform)
         {
             isMinoMove = false;
@@ -183,7 +231,32 @@ public class MoveMino : MonoBehaviour
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
 
-            if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 && verticalAxis <= 22 &&_updateMap.Map[verticalAxis , horizontalAxis] == 0)
+            if (moveDirection == _RIGHTMOVEMINO)
+            {
+                if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis >= 1 && _minoType.ToString() != "IMino")
+                {
+                    
+                }
+                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() != "IMino")
+                {
+
+                }
+                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis >= 1 && _minoType.ToString() == "IMino")
+                {
+
+                }
+                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() == "IMino")
+                {
+
+                }
+            }
+            else if (moveDirection == _LEFTMOVEMINO)
+            {
+
+            }
+
+            if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 && 
+                verticalAxis <= 22 &&_updateMap.Map[verticalAxis , horizontalAxis] == 0)
             {
                 isMinoMove = true;
             }
@@ -196,6 +269,68 @@ public class MoveMino : MonoBehaviour
         return isMinoMove;
     }
 
+    private void TestMe(string moveDirection)
+    {
+        bool isMinoMove = false;
+
+        if (moveDirection == _RIGHTMOVEMINO)
+        {
+            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
+        }
+        else if (moveDirection == _LEFTMOVEMINO)
+        {
+            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+        }
+
+
+        foreach (Transform chlid in _parentTransform)
+        {
+            isMinoMove = false;
+            Vector3 localMinoPos = transform.root.gameObject.transform.InverseTransformPoint(chlid.gameObject.transform.position);
+
+            // 見つけた子オブジェクトのローカル座標を保存
+            int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
+            int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
+
+            if (moveDirection == _RIGHTMOVEMINO)
+            {
+                if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis >= 1 && _minoType.ToString() != "IMino")
+                {
+                    return;
+                }
+                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() != "IMino")
+                {
+                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.AngleAxis(90f,
+                        new Vector2(gameObject.transform.localPosition.x - 1, gameObject.transform.localPosition.x));
+                }
+                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis >= 1 && _minoType.ToString() == "IMino")
+                {
+                    return;
+                }
+                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() == "IMino")
+                {
+
+                }
+            }
+            else if (moveDirection == _LEFTMOVEMINO)
+            {
+
+            }
+
+            if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 &&
+                verticalAxis <= 22 && _updateMap.Map[verticalAxis, horizontalAxis] == 0)
+            {
+                isMinoMove = true;
+            }
+            else
+            {
+                isMinoMove = false;
+                break;
+            }
+        }
+    }
+
     private void StopMino()
     {
         while (gameObject.transform.childCount != 0)
@@ -205,6 +340,7 @@ public class MoveMino : MonoBehaviour
                 chlid.gameObject.transform.parent = _mapObj.transform;
             }
         }
+        gameObject.transform.position = new Vector2(100, 100);
         gameObject.transform.parent = _mapObj.transform;
         gameObject.SetActive(false);
     }

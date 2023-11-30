@@ -19,11 +19,12 @@ public class UpdateMinoMap : MonoBehaviour
     private const string WALLOBJTAG = "Wall";
 
     private DeletionObj _deletionObj;
-    private GameObject[] _des;
     private Transform _parentTransform = default; // 子オブジェクト取得用
 
     private int _desIndex = default;
     private int[,] _map = new int[24, 12]; // 盤面の格納用
+
+    string[,] a = new string[24, 1];
 
     #endregion
 
@@ -54,6 +55,14 @@ public class UpdateMinoMap : MonoBehaviour
     private void Update()
     {
         SearchMino();
+        for(int i = 0; i < Map.GetLength(0); i++){
+            string b = default;
+            for(int j = 0; j < Map.GetLength(1); j++)
+            {
+                b = b + Map[i, j].ToString();
+            }
+            Debug.Log(i + "番目 : " + b);
+        }
     }
 
     // ミノの更新
@@ -115,6 +124,7 @@ public class UpdateMinoMap : MonoBehaviour
 
         if (destoryMinoLine[0] != -1) // 削除出来る列があるときだけ削除処理を呼ぶ
         {
+            Debug.Log(_desIndex);
             DeletionMino(destoryMinoLine);
             DownMino(destoryMinoLine);
         }
@@ -126,7 +136,7 @@ public class UpdateMinoMap : MonoBehaviour
     /// <param name="destoryMinoLine"></param>
     private void DeletionMino(int[] destoryMinoLine)
     {
-        _des = new GameObject[_desIndex];
+        GameObject[] _des = new GameObject[_desIndex];
         int n = 0;
         foreach (Transform chlid in _parentTransform) // 子オブジェクトを取得
         {
@@ -139,18 +149,21 @@ public class UpdateMinoMap : MonoBehaviour
                 // 削除する列と等しい高さのミノを非アクティブにする
                 if (chlid.transform.localPosition.y == -destoryMinoLine[i] && chlid.tag == "Mino") 
                 {
-                    chlid.gameObject.SetActive(false);
                     _des[n] = chlid.gameObject;
+                    chlid.gameObject.SetActive(false);
+                    chlid.position = new Vector2(100, 100);
                     n++;
                     Map[verticalAxis, horizontalAxis] = 0; // 配列を更新する
                 }
             }
+            _desIndex = 0;
         }
 
         // 別オブジェクトを親に設定する
         for(int i = 0; i < _des.Length; i++)
         {
             _des[i].transform.parent = _destoyObj.transform;
+            _des[i] = default;
         }
 
         _deletionObj.DestyoyObj();
@@ -165,11 +178,13 @@ public class UpdateMinoMap : MonoBehaviour
         foreach (Transform chlid in _parentTransform)
         {
             int verticalAxis = Mathf.FloorToInt(-chlid.localPosition.y);
+            int horizontalAxis = Mathf.FloorToInt(chlid.localPosition.x);
             for (int i = 0; i < destoryMinoLine.Length; i++)
             {
                 if (chlid.tag == "Mino" && destoryMinoLine[i] > verticalAxis)
                 {
                     chlid.transform.localPosition = new Vector2(chlid.localPosition.x, chlid.localPosition.y - 1);
+                    Map[verticalAxis, horizontalAxis] = 0;
                 }
             }
         }
