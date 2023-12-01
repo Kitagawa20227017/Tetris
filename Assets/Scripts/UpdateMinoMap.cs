@@ -55,14 +55,14 @@ public class UpdateMinoMap : MonoBehaviour
     private void Update()
     {
         SearchMino();
-        for(int i = 0; i < Map.GetLength(0); i++){
-            string b = default;
-            for(int j = 0; j < Map.GetLength(1); j++)
-            {
-                b = b + Map[i, j].ToString();
-            }
-            Debug.Log(i + "番目 : " + b);
-        }
+        //for(int i = 0; i < Map.GetLength(0); i++){
+        //    string b = default;
+        //    for(int j = 0; j < Map.GetLength(1); j++)
+        //    {
+        //        b = b + Map[i, j].ToString();
+        //    }
+        //    Debug.Log(i + "番目 : " + b);
+        //}
     }
 
     // ミノの更新

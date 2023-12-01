@@ -98,7 +98,8 @@ public class MoveMino : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.A))
         {
-            //gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0,0,90);
+            TestMe(_LEFTMOVEMINO);
+            //gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
             //if (!MinoRevolution(_LEFTMOVEMINO))
             //{
             //    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
@@ -212,14 +213,14 @@ public class MoveMino : MonoBehaviour
     {
         bool isMinoMove = false;
 
-        if (moveDirection == _RIGHTMOVEMINO)
-        {
-            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
-        }
-        else if (moveDirection == _LEFTMOVEMINO)
-        {
-            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
-        }
+        //if (moveDirection == _RIGHTMOVEMINO)
+        //{
+        //    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
+        //}
+        //else if (moveDirection == _LEFTMOVEMINO)
+        //{
+        //    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+        //}
 
 
         foreach (Transform chlid in _parentTransform)
@@ -235,7 +236,7 @@ public class MoveMino : MonoBehaviour
             {
                 if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis >= 1 && _minoType.ToString() != "IMino")
                 {
-                    
+                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
                 }
                 else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() != "IMino")
                 {
@@ -272,6 +273,7 @@ public class MoveMino : MonoBehaviour
     private void TestMe(string moveDirection)
     {
         bool isMinoMove = false;
+        bool isMinoMove2 = false;
 
         if (moveDirection == _RIGHTMOVEMINO)
         {
@@ -292,42 +294,69 @@ public class MoveMino : MonoBehaviour
             int verticalAxis = Mathf.FloorToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.FloorToInt(localMinoPos.x);
 
-            if (moveDirection == _RIGHTMOVEMINO)
+            if (moveDirection == _LEFTMOVEMINO)
             {
-                if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis >= 1 && _minoType.ToString() != "IMino")
+                if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 &&
+                    verticalAxis <= 22 && _updateMap.Map[verticalAxis, horizontalAxis] == 0
+                    && _minoType.ToString() != "IMino")
                 {
-                    return;
+                    Debug.Log(chlid.name + "B");
+                    isMinoMove = true;
+                    isMinoMove2 = false;
                 }
-                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() != "IMino")
+                else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() != "IMino" 
+                    && _updateMap.Map[verticalAxis, horizontalAxis] == 0)
                 {
-                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
-                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.AngleAxis(90f,
-                        new Vector2(gameObject.transform.localPosition.x - 1, gameObject.transform.localPosition.x));
+                    Debug.Log(chlid.name + "A");
+                    isMinoMove = true;
+                    isMinoMove2 = true;
+                    break;
+                    //gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                    //gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.AngleAxis(90f,
+                    //    new Vector2(gameObject.transform.localPosition.x - 1, gameObject.transform.localPosition.x));
                 }
                 else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis >= 1 && _minoType.ToString() == "IMino")
                 {
+                    Debug.Log(chlid.name + "C");
                     return;
                 }
                 else if (verticalAxis >= 1 && verticalAxis <= 22 && horizontalAxis <= 0 && _minoType.ToString() == "IMino")
                 {
-
+                    Debug.Log(chlid.name + "D");
+                }
+                else
+                {
+                    Debug.Log(chlid.name + " : " + verticalAxis);
+                    Debug.Log(chlid.name + " : " + horizontalAxis);
+                    Debug.Log(chlid.name + "??????????");
                 }
             }
-            else if (moveDirection == _LEFTMOVEMINO)
-            {
+            //else if (moveDirection == _LEFTMOVEMINO)
+            //{
 
-            }
+            //}
 
-            if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 &&
-                verticalAxis <= 22 && _updateMap.Map[verticalAxis, horizontalAxis] == 0)
-            {
-                isMinoMove = true;
-            }
-            else
-            {
-                isMinoMove = false;
-                break;
-            }
+            //if (horizontalAxis >= 1 && horizontalAxis <= 10 && verticalAxis >= 1 &&
+            //    verticalAxis <= 22 && _updateMap.Map[verticalAxis, horizontalAxis] == 0)
+            //{
+            //    isMinoMove = true;
+            //}
+            //else
+            //{
+            //    isMinoMove = false;
+            //    break;
+            //}
+        }
+
+        if (isMinoMove && !isMinoMove2)
+        {
+            return;
+        }
+        else if (isMinoMove && isMinoMove2)
+        {
+            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+            gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.AngleAxis(90f,
+                new Vector2(gameObject.transform.localPosition.x - 1, gameObject.transform.localPosition.x));
         }
     }
 
