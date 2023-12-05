@@ -17,14 +17,16 @@ public class UpdateMinoMap : MonoBehaviour
 
     private const string MINOOBJTAG = "Mino";
     private const string WALLOBJTAG = "Wall";
+    private const int DELETEMINOQTY = 10;
+    private const int MINOOBJ = 1;
+    private const int WALLOBJ = -1;
 
-    private DeletionObj _deletionObj;
+    private GameOver _gameOver = default;
+    private DeletionObj _deletionObj = default;
     private Transform _parentTransform = default; // 子オブジェクト取得用
 
-    private int _desIndex = default;
-    private int[,] _map = new int[24, 12]; // 盤面の格納用
-
-    string[,] a = new string[24, 1];
+    private int _desIndex = default;              // ミノ削除用の配列 
+    private int[,] _map = new int[24, 12];        // 盤面の格納用
 
     #endregion
 
@@ -46,6 +48,7 @@ public class UpdateMinoMap : MonoBehaviour
     {
         // オブジェクト、スクリプトの取得、格納
         _deletionObj = GameObject.Find("DeleteObjs").GetComponent<DeletionObj>();
+        _gameOver = GameObject.Find("PlayerMap").GetComponent<GameOver>();
         _parentTransform = this.gameObject.transform;
 
         // マップの初期設定
@@ -55,14 +58,7 @@ public class UpdateMinoMap : MonoBehaviour
     private void Update()
     {
         SearchMino();
-        //for(int i = 0; i < Map.GetLength(0); i++){
-        //    string b = default;
-        //    for(int j = 0; j < Map.GetLength(1); j++)
-        //    {
-        //        b = b + Map[i, j].ToString();
-        //    }
-        //    Debug.Log(i + "番目 : " + b);
-        //}
+        GameOver();
     }
 
     // ミノの更新
@@ -78,11 +74,11 @@ public class UpdateMinoMap : MonoBehaviour
             switch (chlid.tag)
             {
                 case WALLOBJTAG:
-                    Map[verticalAxis, horizontalAxis] = -1;
+                    Map[verticalAxis, horizontalAxis] = WALLOBJ;
                     break;
 
                 case MINOOBJTAG:
-                    Map[verticalAxis, horizontalAxis] = 1;
+                    Map[verticalAxis, horizontalAxis] = MINOOBJ;
                     break;
             }
         }
@@ -116,7 +112,7 @@ public class UpdateMinoMap : MonoBehaviour
             }
             if (isDestory) // 削除出来る列があったときその列を記録する
             {
-                _desIndex += 10;
+                _desIndex += DELETEMINOQTY; // 1列分のミノの個数を増やす
                 destoryMinoLine[countDestoryMino] = i; // 列の記録
                 countDestoryMino++; // 配列を1つ進める
             }
@@ -124,7 +120,6 @@ public class UpdateMinoMap : MonoBehaviour
 
         if (destoryMinoLine[0] != -1) // 削除出来る列があるときだけ削除処理を呼ぶ
         {
-            Debug.Log(_desIndex);
             DeletionMino(destoryMinoLine);
             DownMino(destoryMinoLine);
         }
@@ -136,8 +131,8 @@ public class UpdateMinoMap : MonoBehaviour
     /// <param name="destoryMinoLine"></param>
     private void DeletionMino(int[] destoryMinoLine)
     {
-        GameObject[] _des = new GameObject[_desIndex];
-        int n = 0;
+        GameObject[] _des = new GameObject[_desIndex]; // 削除する分だけの配列をつくる
+        int index = 0; // 配列の指標
         foreach (Transform chlid in _parentTransform) // 子オブジェクトを取得
         {
             // 見つけた子オブジェクトのローカル座標を保存
@@ -146,13 +141,13 @@ public class UpdateMinoMap : MonoBehaviour
 
             for (int i = 0; i < destoryMinoLine.Length; i++) 
             {
-                // 削除する列と等しい高さのミノを非アクティブにする
+                // 削除する列と等しい高さのミノを別の場所に移動して非アクティブにする
                 if (chlid.transform.localPosition.y == -destoryMinoLine[i] && chlid.tag == "Mino") 
                 {
-                    _des[n] = chlid.gameObject;
+                    _des[index] = chlid.gameObject;
                     chlid.gameObject.SetActive(false);
                     chlid.position = new Vector2(100, 100);
-                    n++;
+                    index++;
                     Map[verticalAxis, horizontalAxis] = 0; // 配列を更新する
                 }
             }
@@ -165,7 +160,6 @@ public class UpdateMinoMap : MonoBehaviour
             _des[i].transform.parent = _destoyObj.transform;
             _des[i] = default;
         }
-
         _deletionObj.DestyoyObj();
     }
 
@@ -181,7 +175,7 @@ public class UpdateMinoMap : MonoBehaviour
             int horizontalAxis = Mathf.FloorToInt(chlid.localPosition.x);
             for (int i = 0; i < destoryMinoLine.Length; i++)
             {
-                if (chlid.tag == "Mino" && destoryMinoLine[i] > verticalAxis)
+                if (chlid.tag == "Mino" && destoryMinoLine[i] > verticalAxis) // 削除する列より低いミノの段を下げる
                 {
                     chlid.transform.localPosition = new Vector2(chlid.localPosition.x, chlid.localPosition.y - 1);
                     Map[verticalAxis, horizontalAxis] = 0;
@@ -190,6 +184,14 @@ public class UpdateMinoMap : MonoBehaviour
         }
     }
     
+    private void GameOver()
+    {
+        if(Map[0,4] == 1 || Map[0,5] == 1 || Map[0,6] == 1 || Map[0,7] == 1)
+        {
+            _gameOver.GameOverJudgment();
+        }
+    }
+
     #endregion
 
 }

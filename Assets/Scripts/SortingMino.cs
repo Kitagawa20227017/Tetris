@@ -29,13 +29,6 @@ public class SortingMino : MonoBehaviour
     #region メソッド  
 
     /// <summary>  
-    /// 初期化処理  
-    /// </summary>  
-    void Awake()
-    {
-    }
-     
-    /// <summary>  
     /// 更新前処理  
     /// </summary>  
     void Start ()
