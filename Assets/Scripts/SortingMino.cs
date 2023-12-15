@@ -13,13 +13,13 @@ public class SortingMino : MonoBehaviour
     #region 変数  
 
     [SerializeField] private GameObject[] _minoObjs = default;
-    private int[] _mino = { 0, 0, 0, 0, 0, 0, 0, };
+    private int[] _mino = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private List<int> _randomList = new List<int>();
-    private Vector2 _evenNumberSidePos = new Vector2(10.5f,8.5f);
-    private Vector2 _oddNumberSidePos = new Vector2(10f, 8);
-    private Vector2 _tMinoPos = new Vector2(10f, 9f);
+    readonly private Vector2 _evenNumberSidePos = new Vector2(10.5f,8.5f);
+    readonly private Vector2 _oddNumberSidePos = new Vector2(10f, 8);
+    readonly private Vector2 _tMinoPos = new Vector2(10f, 9f);
 
-    int _indexArray = 0;
+    private int _indexArray = 0;
 
     #endregion
 
