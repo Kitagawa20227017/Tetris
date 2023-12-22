@@ -23,9 +23,6 @@ public class SortingMino : MonoBehaviour
 
     #endregion
 
-    #region プロパティ  
-    #endregion
-
     #region メソッド  
 
     /// <summary>  
