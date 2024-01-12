@@ -38,6 +38,9 @@ public class UpdateMinoMap : MonoBehaviour
     // 削除するミノ数の増加量
     private const int DELETE_MINO_QTY = 10;
 
+    // クリアライン数
+    private const int CLEARLINE = 30;
+
     #endregion
 
     // 非アクティブのミノの一時避難場所
@@ -55,6 +58,9 @@ public class UpdateMinoMap : MonoBehaviour
 
     // 盤面の格納用
     private int[,] _map = new int[24, 12];
+
+    // 消したライン数の記憶
+    private int _lineDeleted = 0;
 
     #endregion
 
@@ -91,6 +97,8 @@ public class UpdateMinoMap : MonoBehaviour
     {
         // マップの探索処理
         UpdateMino();
+
+        
 
         // ゲームオーバーの判定処理
         GameOver();
@@ -158,6 +166,7 @@ public class UpdateMinoMap : MonoBehaviour
             // 削除出来る列があったときその列を記録する
             if (isDestory)
             {
+                _lineDeleted++;
                 _destoyIndex += DELETE_MINO_QTY;           
                 destoryMinoLine[countDestoryMino] = i; 
                 countDestoryMino++;                    
@@ -175,7 +184,7 @@ public class UpdateMinoMap : MonoBehaviour
     /// <summary>
     /// ミノの非アクティブ処理
     /// </summary>
-    /// <param name="destoryMinoLine"></param>
+    /// <param name="destoryMinoLine">ミノの消すラインの列数</param>
     private void DeletionMino(int[] destoryMinoLine)
     {
         // 削除する分だけの配列をつくる
@@ -219,7 +228,7 @@ public class UpdateMinoMap : MonoBehaviour
     /// <summary>
     /// ミノを下げる処理
     /// </summary>
-    /// <param name="downMinoLine"></param>
+    /// <param name="downMinoLine">ミノの段下げの列数</param>
     private void DownMino(int[] downMinoLine)
     {
         foreach (Transform chlid in _parentTransform)
@@ -248,6 +257,14 @@ public class UpdateMinoMap : MonoBehaviour
         if(Map[0,4] == MINO_OBJ || Map[0,5] == MINO_OBJ || Map[0,6] == MINO_OBJ || Map[0,7] == MINO_OBJ)
         {
             _gameOver.GameOverJudgment();
+        }
+    }
+
+    private void GameClear()
+    {
+        if(_lineDeleted >= CLEARLINE)
+        {
+            Debug.Log("Clear");
         }
     }
 
