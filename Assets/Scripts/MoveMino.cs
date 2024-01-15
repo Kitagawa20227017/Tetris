@@ -34,6 +34,7 @@ public class MoveMino : MonoBehaviour
     // マップ(外壁含まない)の横の最大
     private const int MINO_SIDE_MIN = 1;
 
+    // ミノの移動処理
     private const int MOVEMINO = 1;
 
     // Iミノの移動処理
@@ -50,10 +51,13 @@ public class MoveMino : MonoBehaviour
     // 子オブジェクト取得用
     private Transform _parentTransform = default;
 
-
+    // ミノの移動距離
     private int _moveMino = 1;
 
+    // タイマー制限
     private float _minoTimer = 1f;
+
+    // ミノの形
     private string _minoCondition = default;
 
     // ミノの落ちてくる時間を測るタイマー
@@ -117,7 +121,7 @@ public class MoveMino : MonoBehaviour
             _downMinoTimer = 0;
         }
 
-        if (Input.GetKeyDown(KeyCode.C))
+        if (Input.GetButtonDown("HardDrop"))
         {
             HardDorp();
         }
@@ -131,22 +135,22 @@ public class MoveMino : MonoBehaviour
             _minoTimer = 1f;
         }
 
-        if (Input.GetKeyDown(KeyCode.RightArrow) && RotationMino(RIGHT_MOVE_MINO))
+        if (Input.GetButtonDown("RightMove") && RotationMino(RIGHT_MOVE_MINO))
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + MOVEMINO, gameObject.transform.localPosition.y);
         }
-        else if (Input.GetKeyDown(KeyCode.LeftArrow) && RotationMino(LEFT_MOVE_MINO))
+        else if (Input.GetButtonDown("LeftMove") && RotationMino(LEFT_MOVE_MINO))
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - MOVEMINO, gameObject.transform.localPosition.y);
         }
 
-        if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetButtonDown("LeftRotation"))
         {
-            TestMe(LEFT_MOVE_MINO);
+            MinoRevolution(LEFT_MOVE_MINO);
         }
-        else if (Input.GetKeyDown(KeyCode.D))
+        else if (Input.GetButtonDown("RightRotation"))
         {
-            TestMe(RIGHT_MOVE_MINO);
+            MinoRevolution(RIGHT_MOVE_MINO);
         }
     }
 
@@ -247,7 +251,7 @@ public class MoveMino : MonoBehaviour
 
         if (isMinoMove)
         {
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - 1);
+            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVEMINO);
             HardDorp();
         }
         else
@@ -257,36 +261,10 @@ public class MoveMino : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// ミノの重複判定
     /// </summary>
-    /// <returns></returns>
-    private bool MinoRevolution()
-    {
-        bool isMinoMove = false;
-        foreach (Transform chlid in _parentTransform)
-        {
-
-            isMinoMove = false;
-            Vector3 localMinoPos = transform.root.gameObject.transform.InverseTransformPoint(chlid.gameObject.transform.position);
-
-            // 見つけた子オブジェクトのローカル座標を保存
-            int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
-            int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
-
-            if (_updateMap.Map[verticalAxis, horizontalAxis] == 0)
-            {
-                isMinoMove = true;
-            }
-            else
-            {
-                isMinoMove = false;
-                break;
-            }
-        }
-        return isMinoMove;
-    }
-
-    private bool aaa()
+    /// <returns>ミノが重複しているかどうか</returns>
+    private bool MinodUplication()
     {
         bool isMinoMove = default;
         foreach (Transform chlid in _parentTransform)
@@ -295,32 +273,30 @@ public class MoveMino : MonoBehaviour
             // 見つけた子オブジェクトのローカル座標を保存
             int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
-            Debug.Log(chlid.name + " : " + _updateMap.Map[verticalAxis, horizontalAxis]);
-            Debug.Log(chlid.name + " : " + verticalAxis);
-            Debug.Log(chlid.name + " : " + horizontalAxis);
-            if (_updateMap.Map[verticalAxis,horizontalAxis] == 0)
-            {
-                isMinoMove = true;
-            }
-            else if(_updateMap.Map[verticalAxis, horizontalAxis] != 0)
+            if(horizontalAxis >= MAP_SIDE_MAX || horizontalAxis <= MAP_SIDE_MIN || _updateMap.Map[verticalAxis, horizontalAxis] != 0)
             {
                 isMinoMove = false;
-                break;
+                return isMinoMove;
+            }
+            else if(_updateMap.Map[verticalAxis, horizontalAxis] == 0)
+            {
+                isMinoMove = true;
             }
         }
         return isMinoMove;
     }
 
     /// <summary>
-    /// 
+    /// ミノの回転処理
     /// </summary>
-    /// <param name="moveDirection"></param>
-    private void TestMe(string moveDirection)
+    /// <param name="moveDirection">ミノの回転方向</param>
+    private void MinoRevolution(string moveDirection)
     {
         int n = 0;
-        bool isMinoMove = false;
+        bool isMinoMove = true;
 
-        if (transform.localPosition.y < -0.5)
+        // 回転させる
+        if (transform.localPosition.y < -0.5) // 上にはみ出たらなにもせず返す
         {
             if (moveDirection == RIGHT_MOVE_MINO)
             {
@@ -336,136 +312,70 @@ public class MoveMino : MonoBehaviour
             return;
         }
 
-        foreach (Transform chlid in _parentTransform)
+        // ミノの回転した先に別のオブジェクトがある場合
+        if(!MinodUplication())
         {
-            isMinoMove = false;
-            Vector3 localMinoPos = transform.root.gameObject.transform.InverseTransformPoint(chlid.gameObject.transform.position);
-            // 見つけた子オブジェクトのローカル座標を保存
-            int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
-            int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
-            if (horizontalAxis >= MINO_SIDE_MIN && horizontalAxis <= MINO_SIDE_MAX &&
-                _updateMap.Map[verticalAxis, horizontalAxis] == 0 && verticalAxis > 0
-                && _minoCondition != "IMino")
+            // Iミノの動かす距離の変動
+            if ((_minoCondition == "IMino" && transform.localPosition.x == 9.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 1.5f))
             {
-                Debug.Log("1");
-                n = horizontalAxis;
-                isMinoMove = true;
+                _moveMino = MOVEMINO;
             }
-            else if (horizontalAxis >= MAP_SIDE_MIN && horizontalAxis <= MAP_SIDE_MAX &&
-                    _updateMap.Map[verticalAxis, horizontalAxis] != 0 && verticalAxis > 0
-                     && _minoCondition != "IMino")
+            else if ((_minoCondition == "IMino" && transform.localPosition.x == 10.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 0.5f))
             {
-                Debug.Log("2");
-                _moveMino = 1;
-                n = horizontalAxis;
-                isMinoMove = false;
-                break;
+                _moveMino = IMINO_MOVE;
             }
-            else if (horizontalAxis >= MAP_SIDE_MIN && horizontalAxis <= MAP_SIDE_MAX &&
-                    verticalAxis >= 0 && _updateMap.Map[verticalAxis, horizontalAxis] == 0 && verticalAxis > 0
-                     && _minoCondition == "IMino")
-            {
-                Debug.Log("3");
-                n = horizontalAxis;
-                _moveMino = 2;
-                isMinoMove = true;
-            }
-            else if (horizontalAxis >= MAP_SIDE_MIN && horizontalAxis <= MAP_SIDE_MAX &&
-                    verticalAxis >= 2 && _updateMap.Map[verticalAxis, horizontalAxis] != 0 && verticalAxis > 0
-                     && _minoCondition == "IMino")
-            {
-                Debug.Log("4");
-                _moveMino = 2;
-                n = horizontalAxis;
-                isMinoMove = false;
-                break;
-            }
-            Debug.Log(n);
-        }
 
-        if (isMinoMove)
-        {
-            if (moveDirection == RIGHT_MOVE_MINO)
+            // 重複orはみ出たのが盤面の左右どちら側なのか判定
+            foreach (Transform chlid in _parentTransform)
             {
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                Vector3 localMinoPos = transform.root.gameObject.transform.InverseTransformPoint(chlid.gameObject.transform.position);
+                // 見つけた子オブジェクトのローカル座標を保存
+                int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
+                int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
+                if (horizontalAxis >= MAP_SIDE_MAX || horizontalAxis <= MAP_SIDE_MIN || _updateMap.Map[verticalAxis, horizontalAxis] != 0)
+                {
+                    n = horizontalAxis;
+                    break;
+                }
             }
-            else if (moveDirection == LEFT_MOVE_MINO)
+
+            // 重複orはみ出た方向により移動方向の変動
+            if (n <= 5)
             {
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
+                transform.localPosition = new Vector2(gameObject.transform.localPosition.x + _moveMino, gameObject.transform.localPosition.y);
             }
-            Debug.Log(aaa());
-            Debug.Log("A");
-        }
-        else if (!isMinoMove && moveDirection == LEFT_MOVE_MINO && n < MINO_SIDE_MIN)
-        {
-            Debug.Log("B");
-            if ((_minoCondition == "IMino" && transform.localPosition.x == 9.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 1.5f))
+            else if(n >= 6)
             {
-                _moveMino = 1;
+                transform.localPosition = new Vector2(gameObject.transform.localPosition.x - _moveMino, gameObject.transform.localPosition.y);
             }
-            else if ((_minoCondition == "IMino" && transform.localPosition.x == 10.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 0.5f))
+
+            // 移動させてまた重複したら回転できないので最初の回転前まで戻す
+            if(!MinodUplication())
             {
-                _moveMino = 2;
+                // 左右の位置を処理前に変更
+                if (n <= 5)
+                {
+                    gameObject.transform.localPosition = new Vector2(transform.localPosition.x - _moveMino, gameObject.transform.localPosition.y);
+                }
+                else if (n >= 6)
+                {
+                    gameObject.transform.localPosition = new Vector2(transform.localPosition.x + _moveMino, gameObject.transform.localPosition.y);
+                }
+                isMinoMove = false;
             }
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + _moveMino, gameObject.transform.localPosition.y);
-            if (!MinoRevolution())
+
+
+            if (!isMinoMove)
             {
-                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - _moveMino, gameObject.transform.localPosition.y);
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
-            }
-        }
-        else if (!isMinoMove && moveDirection == LEFT_MOVE_MINO && n > MINO_SIDE_MAX)
-        {
-            Debug.Log("C");
-            if ((_minoCondition == "IMino" && transform.localPosition.x == 9.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 1.5f))
-            {
-                _moveMino = 1;
-            }
-            else if ((_minoCondition == "IMino" && transform.localPosition.x == 10.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 0.5f))
-            {
-                _moveMino = 2;
-            }
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - _moveMino, gameObject.transform.localPosition.y);
-            if (!MinoRevolution())
-            {
-                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + _moveMino, gameObject.transform.localPosition.y);
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
-            }
-        }
-        else if (!isMinoMove && moveDirection == RIGHT_MOVE_MINO && n < MINO_SIDE_MIN)
-        {
-            Debug.Log("D");
-            if ((_minoCondition == "IMino" && transform.localPosition.x == 9.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 1.5f))
-            {
-                _moveMino = 1;
-            }
-            else if ((_minoCondition == "IMino" && transform.localPosition.x == 10.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 0.5f))
-            {
-                _moveMino = 2;
-            }
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + _moveMino, gameObject.transform.localPosition.y);
-            if (!MinoRevolution())
-            {
-                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - _moveMino, gameObject.transform.localPosition.y);
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
-            }
-        }
-        else if (!isMinoMove && moveDirection == RIGHT_MOVE_MINO && n > MINO_SIDE_MAX)
-        {
-            Debug.Log("E");
-            if ((_minoCondition == "IMino" && transform.localPosition.x == 9.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 1.5f))
-            {
-                _moveMino = 1;
-            }
-            else if ((_minoCondition == "IMino" && transform.localPosition.x == 10.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 0.5f))
-            {
-                _moveMino = 2;
-            }
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - _moveMino, gameObject.transform.localPosition.y);
-            if (!MinoRevolution())
-            {
-                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + _moveMino, gameObject.transform.localPosition.y);
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                // 回転させる前に変更
+                if (moveDirection == RIGHT_MOVE_MINO)
+                {
+                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                }
+                else if (moveDirection == LEFT_MOVE_MINO)
+                {
+                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
+                }
             }
         }
     }

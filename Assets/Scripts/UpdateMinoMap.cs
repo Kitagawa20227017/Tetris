@@ -14,6 +14,7 @@ public class UpdateMinoMap : MonoBehaviour
 
     // 削除するオブジェクトの一時保存場所
     [SerializeField] private GameObject _destoyObj = default;
+    [SerializeField] private SortingMino _sortingMino = default;
 
     #region const定数
 
@@ -57,7 +58,7 @@ public class UpdateMinoMap : MonoBehaviour
     private int _destoyIndex = default;
 
     // 盤面の格納用
-    private int[,] _map = new int[24, 12];
+    private int[,] _map = new int[25, 12];
 
     // 消したライン数の記憶
     private int _lineDeleted = 0;
@@ -84,6 +85,7 @@ public class UpdateMinoMap : MonoBehaviour
         // オブジェクト、スクリプトの取得、格納
         _deletionObj = GameObject.Find("DeleteObjs").GetComponent<DeletionObj>();
         _gameOver = GameObject.Find("PlayerMap").GetComponent<GameOver>();
+        _sortingMino = GameObject.Find("PlayerMap").GetComponent<SortingMino>();
         _parentTransform = this.gameObject.transform;
 
         // マップの初期設定
@@ -98,7 +100,7 @@ public class UpdateMinoMap : MonoBehaviour
         // マップの探索処理
         UpdateMino();
 
-        
+        GameClear();
 
         // ゲームオーバーの判定処理
         GameOver();
@@ -248,15 +250,31 @@ public class UpdateMinoMap : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// ゲームオーバー判定処理
     /// </summary>
     private void GameOver()
     {
-        if(Map[0,4] == MINO_OBJ || Map[0,5] == MINO_OBJ || Map[0,6] == MINO_OBJ || Map[0,7] == MINO_OBJ)
+        int tem = _sortingMino.IndexArray;
+        if(tem + 1 >= 14)
         {
-            _gameOver.GameOverJudgment();
+            tem = 0;
+        }
+        if (_sortingMino.Mino[tem] == 1)
+        {
+            if (Map[0, 4] == MINO_OBJ || Map[0, 5] == MINO_OBJ || Map[0, 6] == MINO_OBJ || Map[0, 7] == MINO_OBJ)
+            {
+                _gameOver.GameOverJudgment();
+            }
+        }
+        else if (_sortingMino.Mino[tem] != 1)
+        {
+            if (Map[0, 4] == MINO_OBJ || Map[0, 5] == MINO_OBJ || Map[0, 6] == MINO_OBJ || Map[0, 7] == MINO_OBJ ||
+                Map[1, 4] == MINO_OBJ || Map[1, 5] == MINO_OBJ || Map[1, 6] == MINO_OBJ || Map[1, 7] == MINO_OBJ)
+            {
+                _gameOver.GameOverJudgment();
+            }
         }
     }
 
