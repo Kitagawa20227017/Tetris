@@ -1,5 +1,5 @@
 // ---------------------------------------------------------  
-// SortingMino.cs  
+// Sortingmino.cs  
 //   
 // 作成日:  2023/11/16
 // 作成者:  
@@ -12,31 +12,83 @@ public class SortingMino : MonoBehaviour
 
     #region 変数  
 
+    #region const変数
+
+    // ランダム用の初期化数値
+    private const int BEFORE_NUMBER = 3;
+    private const int BEHIND_NUMBER = 11;
+    private const int BEFORE_NUMBER_START = 7;
+    private const int BEHIND_NUMBER_START = 0;
+
+    // 
+    private const int ARRAY_MINO_LAST = 13;
+    private const int INITIAL_VALUE = -1;
+
+    // ミノの判定用
+    private const int OMINO = 0;
+    private const int IMINO = 1;
+    private const int TMINO = 2;
+
+    // 
+    private const int ARRAY_OVER = 14;
+
+    // 表示するミノの初期化用
+    private const float INITIAL_POS_X = 21f;
+    private const float INITIAL_POS_Y = 5f;
+
+    // 表示するミノの位置の間隔
+    private const float NEXT_MINO_MOVE_FEW = 2.5f;
+    private const float NEXT_MINO_MOVE_GREAT = 3f;
+
+    //
+    private const int ARRAY_NUMBER_BEFORE = 2;
+
+    #endregion
+
+    // 各ミノの親オブジェクト
     [SerializeField] private GameObject[] _minoObjs = default;
     [SerializeField] private GameObject[] _mino_Objs_model = default;
     [SerializeField] private GameObject _modelObjs = default;
+    [SerializeField] private GameObject _keepMino = default;
+
     // 削除するオブジェクトの一時保存場所
     [SerializeField] private GameObject _destoyObj = default;
 
     // 非アクティブのミノの一時避難場所
     readonly private Vector2 _evacuation = new Vector2(100f, 100f);
+
     // 子オブジェクト取得用
     private Transform _parentTransform = default;
 
+    // 出現させるミノ格納
     private int[] mino = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+    // ランダム用のリスト
     private List<int> _randomList = new List<int>();
+
+    // 各ミノの出現位置
     readonly private Vector2 _evenNumberSidePos = new Vector2(10.5f, 8.5f);
     readonly private Vector2 _oddNumberSidePos = new Vector2(10f, 8);
     readonly private Vector2 _tMinoPos = new Vector2(10f, 9f);
-    private Vector2 _test = new Vector2(21f, 7f);
-    private float qq = 21f,ii = 5f;
-    int[] lll = new int[4];
-    GameObject[] ppp = new GameObject[4];
-    private int indexArray = 0;
-    int _keepMino = -1;
-    public int IndexArray { get => indexArray; set => indexArray = value; }
-    public int[] Mino { get => mino; set => mino = value; }
+
+    // ストックのミノの位置
+    readonly private Vector2 _keepMinoPos = new Vector2(0f, 4f);
+
+    // ストックするミノ
+    private int _keepMinoNumber = -1;
+
+    // ストック管理
+    bool _isKeep = default;
+
+    // 次にくるミノの位置の初期位置
+    private float _nextMinoPosX = 21f, _nextMinoPosY = 5f;
+
+    // 表示するミノの格納
+    private int[] _nextMino = new int[4];
+    private GameObject[] _nextMinoObj = new GameObject[4];
+
+    // 出現させるミノの指標
+    private int _indexArray = 0;
 
     #endregion
 
@@ -45,37 +97,46 @@ public class SortingMino : MonoBehaviour
     /// <summary>  
     /// 更新前処理  
     /// </summary>  
-    void Start()
+    private void Start()
     {
         _parentTransform = _modelObjs.gameObject.transform;
         RandomNunber();
     }
 
-    /// <summary>  
-    /// 更新処理  
-    /// </summary>  
-    void Update()
+    private void Update()
     {
-        //if (Input.GetButton("KeepMino"))
-        //{
-        //    KeepMIno();
-        //}
-        if (gameObject.transform.childCount == 0)
+        if(Input.GetButtonDown("KeepMino") && _isKeep)
         {
-            aaa();
+            _isKeep = false;
+            KeepMino();
         }
     }
 
+    /// <summary>
+    /// ミノが出現可能かの判定
+    /// </summary>
+    public void IsAdvent()
+    {
+        if (gameObject.transform.childCount == 0)
+        {
+            _isKeep = true;
+            Advent();
+        }
+    }
+
+    /// <summary>
+    /// ミノの順番をランダムに決める
+    /// </summary>
     private void RandomNunber()
     {
-        int conut = IndexArray;
-        if(conut == 3)
+        int conut = _indexArray;
+        if(conut == BEFORE_NUMBER)
         {
-            conut = 7;
+            conut = BEFORE_NUMBER_START;
         }
-        else if(conut == 11)
+        else if(conut == BEHIND_NUMBER)
         {
-            conut = 0;
+            conut = BEHIND_NUMBER_START;
         }
 
         for (int i = 0; i <= 6; i++)
@@ -85,129 +146,148 @@ public class SortingMino : MonoBehaviour
         while (_randomList.Count > 0)
         {
             int indexNunber = Random.Range(0, _randomList.Count);
-            Mino[conut] = _randomList[indexNunber];
+            mino[conut] = _randomList[indexNunber];
             _randomList.RemoveAt(indexNunber);
             conut++;
         }
     }
 
-    private void KeepMIno()
+    /// <summary>
+    /// ミノのストック処理
+    /// </summary>
+    private void KeepMino()
     {
-        int n = indexArray;
-        if(n - 1 <= -1)
+        int onePrevious = _indexArray - 1;
+        if (onePrevious <= INITIAL_VALUE)
         {
-            n = 13;
+            onePrevious = ARRAY_MINO_LAST;
         }
-        if(_keepMino == -1)
+
+        gameObject.transform.GetChild(0).gameObject.transform.position = _evacuation;
+        gameObject.transform.GetChild(0).gameObject.SetActive(false);
+        gameObject.transform.GetChild(0).gameObject.transform.parent = _destoyObj.transform;
+
+        if (_keepMinoNumber == INITIAL_VALUE)
         {
-            _keepMino = Mino[n];
+            _keepMinoNumber = mino[onePrevious];
         }
         else
         {
-            int tem = _keepMino;
-            _keepMino = n;
-            n = tem;
-            if (n == 1 || Mino[IndexArray] == 0)
+            int tem = _keepMinoNumber;
+            _keepMinoNumber = mino[onePrevious];
+            onePrevious = tem;
+            if (onePrevious == OMINO || onePrevious == IMINO)
             {
-                Instantiate(_minoObjs[Mino[IndexArray]], _evenNumberSidePos, Quaternion.identity, this.transform);
-               
+                Instantiate(_minoObjs[onePrevious], _evenNumberSidePos, Quaternion.identity, this.transform);
             }
-            else if (n == 2)
+            else if (onePrevious == TMINO)
             {
-                Instantiate(_minoObjs[Mino[IndexArray]], _tMinoPos, Quaternion.identity, this.transform);
-                
+                Instantiate(_minoObjs[onePrevious], _tMinoPos, Quaternion.identity, this.transform);
             }
             else
             {
-                Instantiate(_minoObjs[Mino[IndexArray]], _oddNumberSidePos, Quaternion.identity, this.transform);
+                Instantiate(_minoObjs[onePrevious], _oddNumberSidePos, Quaternion.identity, this.transform);
             }
-            gameObject.transform.GetChild(0).gameObject.transform.position = _evacuation;
-            gameObject.transform.GetChild(0).gameObject.SetActive(false);
-            gameObject.transform.GetChild(0).gameObject.transform.parent = _destoyObj.transform;
         }
-        
+
+        if (_keepMino.gameObject.transform.childCount == 0)
+        {
+            Instantiate(_mino_Objs_model[mino[onePrevious]], _keepMinoPos, Quaternion.identity, _keepMino.transform);
+        }
+        else
+        {
+            _keepMino.gameObject.transform.GetChild(0).gameObject.transform.position = _evacuation;
+            _keepMino.gameObject.transform.GetChild(0).gameObject.SetActive(false);
+            _keepMino.gameObject.transform.GetChild(0).gameObject.transform.parent = _destoyObj.transform;
+            Instantiate(_mino_Objs_model[_keepMinoNumber], _keepMinoPos, Quaternion.identity, _keepMino.transform);
+        }
+        _isKeep = false;
     }
 
-    private void aaa()
+
+    /// <summary>
+    /// ミノの出現処理
+    /// </summary>
+    private void Advent()
     {
-        if (ppp[0] == null)
+        if (_nextMinoObj[0] == null)
         {
-            
+            // 何もしない
         }
         else
         {
-            for (int i = 0; i < lll.Length; i++)
+            for (int i = 0; i < _nextMino.Length; i++)
             {
-                ppp[i].transform.position = _evacuation;
-                ppp[i].SetActive(false);
-                ppp[i].transform.parent = _destoyObj.transform;
-                ppp[i] = default;
+                _nextMinoObj[i].transform.position = _evacuation;
+                _nextMinoObj[i].SetActive(false);
+                _nextMinoObj[i].transform.parent = _destoyObj.transform;
+                _nextMinoObj[i] = default;
             }
         }
 
-        if (Mino[IndexArray] == 1 || Mino[IndexArray] == 0)
+        if (mino[_indexArray] == OMINO || mino[_indexArray] == IMINO)
         {
-            Instantiate(_minoObjs[Mino[IndexArray]], _evenNumberSidePos, Quaternion.identity, this.transform);
-            IndexArray++;
-            if(IndexArray >= 14)
+            Instantiate(_minoObjs[mino[_indexArray]], _evenNumberSidePos, Quaternion.identity, this.transform);
+            _indexArray++;
+            if(_indexArray >= ARRAY_OVER)
             {
-                IndexArray = 0;
+                _indexArray = 0;
             }
-            if (IndexArray == 3 || IndexArray == 11)
+            if (_indexArray == BEFORE_NUMBER || _indexArray == BEHIND_NUMBER)
             {
                 RandomNunber();
             }
         }
-        else if (Mino[IndexArray] == 2)
+        else if (mino[_indexArray] == TMINO)
         {
-            Instantiate(_minoObjs[Mino[IndexArray]], _tMinoPos, Quaternion.identity, this.transform);
-            IndexArray++;
-            if (IndexArray >= 14)
+            Instantiate(_minoObjs[mino[_indexArray]], _tMinoPos, Quaternion.identity, this.transform);
+            _indexArray++;
+            if (_indexArray >= ARRAY_OVER)
             {
-                IndexArray = 0;
+                _indexArray = 0;
             }
-            if (IndexArray == 3 || IndexArray == 11)
+            if (_indexArray == BEFORE_NUMBER || _indexArray == BEHIND_NUMBER)
             {
                 RandomNunber();
             }
         }
         else
         {
-            Instantiate(_minoObjs[Mino[IndexArray]], _oddNumberSidePos, Quaternion.identity, this.transform);
-            IndexArray++;
-            if (IndexArray >= 14)
+            Instantiate(_minoObjs[mino[_indexArray]], _oddNumberSidePos, Quaternion.identity, this.transform);
+            _indexArray++;
+            if (_indexArray >= ARRAY_OVER)
             {
-                IndexArray = 0;
+                _indexArray = 0;
             }
-            if (IndexArray == 3 || IndexArray == 11)
+            if (_indexArray == BEFORE_NUMBER || _indexArray == BEHIND_NUMBER)
             {
                 RandomNunber();
             }
         }
 
-        qq = 21f;
-        ii = 5f;
-        int j = IndexArray;
-        for (int i = 0; i < lll.Length; i++)
+        _nextMinoPosX = INITIAL_POS_X;
+         _nextMinoPosY = INITIAL_POS_Y;
+        int nowNumber = _indexArray;
+        for (int i = 0; i < _nextMino.Length; i++)
         {
-            if(j >= 14)
+            if(nowNumber >= ARRAY_OVER)
             {
-                j = 0;
+                nowNumber = 0;
             }
-            Instantiate(_mino_Objs_model[Mino[j]], new Vector2(qq,ii), Quaternion.identity,_modelObjs.transform);
-            if (j+1 >= 14)
+            Instantiate(_mino_Objs_model[mino[nowNumber]], new Vector2(_nextMinoPosX, _nextMinoPosY), Quaternion.identity,_modelObjs.transform);
+            if (nowNumber+1 >= ARRAY_OVER)
             {
-                j = 0;
+                nowNumber = 0;
             }
-            if (i <= 2 && Mino[j + 1] == 1)
+            if (i <= ARRAY_NUMBER_BEFORE && mino[nowNumber + 1] == 1)
             { 
-                ii = ii - 2.5f;
+                 _nextMinoPosY =  _nextMinoPosY - NEXT_MINO_MOVE_FEW;
             }
-            else if(i <= 2 && Mino[j + 1] != 1)
+            else if(i <= ARRAY_NUMBER_BEFORE && mino[nowNumber + 1] != 1)
             {
-                ii = ii - 3f;
+                 _nextMinoPosY =  _nextMinoPosY - NEXT_MINO_MOVE_GREAT;
             }
-            j++;
+            nowNumber++;
         }
 
         int n = 0;
@@ -215,7 +295,7 @@ public class SortingMino : MonoBehaviour
         {
             foreach (Transform chlid in _parentTransform)
             {
-                ppp[n] = chlid.gameObject;
+                _nextMinoObj[n] = chlid.gameObject;
                 n++;
             }
         }

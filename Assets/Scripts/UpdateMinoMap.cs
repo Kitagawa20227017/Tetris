@@ -14,7 +14,8 @@ public class UpdateMinoMap : MonoBehaviour
 
     // 削除するオブジェクトの一時保存場所
     [SerializeField] private GameObject _destoyObj = default;
-    [SerializeField] private SortingMino _sortingMino = default;
+
+    private SortingMino _sortingMino = default;
 
     #region const定数
 
@@ -100,6 +101,10 @@ public class UpdateMinoMap : MonoBehaviour
         // マップの探索処理
         UpdateMino();
 
+        // 
+        _sortingMino.IsAdvent();
+
+        // 
         GameClear();
 
         // ゲームオーバーの判定処理
@@ -256,25 +261,9 @@ public class UpdateMinoMap : MonoBehaviour
     /// </summary>
     private void GameOver()
     {
-        int tem = _sortingMino.IndexArray;
-        if(tem + 1 >= 14)
+        if (Map[0, 4] == MINO_OBJ || Map[0, 5] == MINO_OBJ || Map[0, 6] == MINO_OBJ || Map[0, 7] == MINO_OBJ)
         {
-            tem = 0;
-        }
-        if (_sortingMino.Mino[tem] == 1)
-        {
-            if (Map[0, 4] == MINO_OBJ || Map[0, 5] == MINO_OBJ || Map[0, 6] == MINO_OBJ || Map[0, 7] == MINO_OBJ)
-            {
-                _gameOver.GameOverJudgment();
-            }
-        }
-        else if (_sortingMino.Mino[tem] != 1)
-        {
-            if (Map[0, 4] == MINO_OBJ || Map[0, 5] == MINO_OBJ || Map[0, 6] == MINO_OBJ || Map[0, 7] == MINO_OBJ ||
-                Map[1, 4] == MINO_OBJ || Map[1, 5] == MINO_OBJ || Map[1, 6] == MINO_OBJ || Map[1, 7] == MINO_OBJ)
-            {
-                _gameOver.GameOverJudgment();
-            }
+            _gameOver.GameOverJudgment();
         }
     }
 
