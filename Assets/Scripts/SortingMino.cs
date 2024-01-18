@@ -20,7 +20,7 @@ public class SortingMino : MonoBehaviour
     private const int BEFORE_NUMBER_START = 7;
     private const int BEHIND_NUMBER_START = 0;
 
-    // 
+    // ストック用の判定
     private const int ARRAY_MINO_LAST = 13;
     private const int INITIAL_VALUE = -1;
 
@@ -29,7 +29,7 @@ public class SortingMino : MonoBehaviour
     private const int IMINO = 1;
     private const int TMINO = 2;
 
-    // 
+    // 配列外判定
     private const int ARRAY_OVER = 14;
 
     // 表示するミノの初期化用
@@ -40,7 +40,7 @@ public class SortingMino : MonoBehaviour
     private const float NEXT_MINO_MOVE_FEW = 2.5f;
     private const float NEXT_MINO_MOVE_GREAT = 3f;
 
-    //
+    // 配列の最後から１つ前
     private const int ARRAY_NUMBER_BEFORE = 2;
 
     #endregion
@@ -158,24 +158,31 @@ public class SortingMino : MonoBehaviour
     private void KeepMino()
     {
         int onePrevious = _indexArray - 1;
+
+        // 配列外にならないようにする
         if (onePrevious <= INITIAL_VALUE)
         {
             onePrevious = ARRAY_MINO_LAST;
         }
 
+        // ミノを消す
         gameObject.transform.GetChild(0).gameObject.transform.position = _evacuation;
         gameObject.transform.GetChild(0).gameObject.SetActive(false);
         gameObject.transform.GetChild(0).gameObject.transform.parent = _destoyObj.transform;
 
+        // 何もストックしてない時
         if (_keepMinoNumber == INITIAL_VALUE)
         {
             _keepMinoNumber = mino[onePrevious];
         }
-        else
+        else // 何かストックしている時
         {
+            // ミノの番号の入れ替え
             int tem = _keepMinoNumber;
             _keepMinoNumber = mino[onePrevious];
             onePrevious = tem;
+
+            // ストックしてたミノを出現させる
             if (onePrevious == OMINO || onePrevious == IMINO)
             {
                 Instantiate(_minoObjs[onePrevious], _evenNumberSidePos, Quaternion.identity, this.transform);
@@ -190,6 +197,7 @@ public class SortingMino : MonoBehaviour
             }
         }
 
+        // ストックしているミノを表示する
         if (_keepMino.gameObject.transform.childCount == 0)
         {
             Instantiate(_mino_Objs_model[mino[onePrevious]], _keepMinoPos, Quaternion.identity, _keepMino.transform);
@@ -225,6 +233,7 @@ public class SortingMino : MonoBehaviour
             }
         }
 
+        // ミノの出現
         if (mino[_indexArray] == OMINO || mino[_indexArray] == IMINO)
         {
             Instantiate(_minoObjs[mino[_indexArray]], _evenNumberSidePos, Quaternion.identity, this.transform);
@@ -265,9 +274,11 @@ public class SortingMino : MonoBehaviour
             }
         }
 
+        // 初期化
         _nextMinoPosX = INITIAL_POS_X;
          _nextMinoPosY = INITIAL_POS_Y;
         int nowNumber = _indexArray;
+        // ミノの出現予測表示
         for (int i = 0; i < _nextMino.Length; i++)
         {
             if(nowNumber >= ARRAY_OVER)

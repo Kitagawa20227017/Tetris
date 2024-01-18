@@ -101,10 +101,10 @@ public class UpdateMinoMap : MonoBehaviour
         // マップの探索処理
         UpdateMino();
 
-        // 
+        // ミノの出現処理
         _sortingMino.IsAdvent();
 
-        // 
+        // ゲームクリアの判定処理
         GameClear();
 
         // ゲームオーバーの判定処理
@@ -267,6 +267,9 @@ public class UpdateMinoMap : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ゲームクリア判定
+    /// </summary>
     private void GameClear()
     {
         if(_lineDeleted >= CLEARLINE)

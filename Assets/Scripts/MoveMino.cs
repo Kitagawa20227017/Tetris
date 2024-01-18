@@ -35,10 +35,18 @@ public class MoveMino : MonoBehaviour
     private const int MINO_SIDE_MIN = 1;
 
     // ミノの移動処理
-    private const int MOVEMINO = 1;
+    private const int MOVE_MINO = 1;
 
     // Iミノの移動処理
     private const int IMINO_MOVE = 2;
+
+    // 外壁から1マス内側の位置
+    
+
+
+    // 外壁から2マス内側の位置
+
+
 
     #endregion
 
@@ -50,6 +58,12 @@ public class MoveMino : MonoBehaviour
 
     // 子オブジェクト取得用
     private Transform _parentTransform = default;
+
+    // 
+    readonly private Quaternion _rightRotetion = Quaternion.Euler(0, 0, 90);
+
+    // 
+    readonly private Quaternion _leftRotetion = Quaternion.Euler(0, 0, -90);
 
     // ミノの移動距離
     private int _moveMino = 1;
@@ -112,7 +126,7 @@ public class MoveMino : MonoBehaviour
         {
             if (DownMove())
             {
-                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVEMINO);
+                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVE_MINO);
             }
             else
             {
@@ -137,11 +151,11 @@ public class MoveMino : MonoBehaviour
 
         if (Input.GetButtonDown("RightMove") && RotationMino(RIGHT_MOVE_MINO))
         {
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + MOVEMINO, gameObject.transform.localPosition.y);
+            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + MOVE_MINO, gameObject.transform.localPosition.y);
         }
         else if (Input.GetButtonDown("LeftMove") && RotationMino(LEFT_MOVE_MINO))
         {
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - MOVEMINO, gameObject.transform.localPosition.y);
+            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - MOVE_MINO, gameObject.transform.localPosition.y);
         }
 
         if (Input.GetButtonDown("LeftRotation"))
@@ -158,7 +172,7 @@ public class MoveMino : MonoBehaviour
     /// ミノの左右移動処理
     /// </summary>
     /// <param name="moveDirection"></param>
-    /// <returns></returns>
+    /// <returns>左右移動判定結果</returns>
     private bool RotationMino(string moveDirection)
     {
         bool isMinoMove = false;
@@ -200,9 +214,9 @@ public class MoveMino : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// ミノの落下判定処理
     /// </summary>
-    /// <returns></returns>
+    /// <returns>落下判定結果</returns>
     private bool DownMove()
     {
         bool isMinoMove = false;
@@ -226,7 +240,7 @@ public class MoveMino : MonoBehaviour
     }
 
     /// <summary>
-    /// 
+    /// ハードドロップの処理
     /// </summary>
     private void HardDorp()
     {
@@ -251,7 +265,7 @@ public class MoveMino : MonoBehaviour
 
         if (isMinoMove)
         {
-            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVEMINO);
+            gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVE_MINO);
             HardDorp();
         }
         else
@@ -300,11 +314,11 @@ public class MoveMino : MonoBehaviour
         {
             if (moveDirection == RIGHT_MOVE_MINO)
             {
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
+                gameObject.transform.localRotation = gameObject.transform.localRotation * _rightRotetion;
             }
             else if (moveDirection == LEFT_MOVE_MINO)
             {
-                gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                gameObject.transform.localRotation = gameObject.transform.localRotation * _leftRotetion;
             }
         }
         else
@@ -318,7 +332,7 @@ public class MoveMino : MonoBehaviour
             // Iミノの動かす距離の変動
             if ((_minoCondition == "IMino" && transform.localPosition.x == 9.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 1.5f))
             {
-                _moveMino = MOVEMINO;
+                _moveMino = MOVE_MINO;
             }
             else if ((_minoCondition == "IMino" && transform.localPosition.x == 10.5f) || (_minoCondition == "IMino" && transform.localPosition.x == 0.5f))
             {
@@ -370,18 +384,18 @@ public class MoveMino : MonoBehaviour
                 // 回転させる前に変更
                 if (moveDirection == RIGHT_MOVE_MINO)
                 {
-                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, -90);
+                    gameObject.transform.localRotation = gameObject.transform.localRotation * _leftRotetion;
                 }
                 else if (moveDirection == LEFT_MOVE_MINO)
                 {
-                    gameObject.transform.localRotation = gameObject.transform.localRotation * Quaternion.Euler(0, 0, 90);
+                    gameObject.transform.localRotation = gameObject.transform.localRotation * _rightRotetion;
                 }
             }
         }
     }
 
     /// <summary>
-    /// 
+    /// ミノの落下を止める処理
     /// </summary>
     private void StopMino()
     {

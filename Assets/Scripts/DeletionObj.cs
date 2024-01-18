@@ -14,7 +14,7 @@ public class DeletionObj : MonoBehaviour
 
     // 子オブジェクト取得用
     private Transform _parentTransform = default;
-    private const int DESTYOYCONUT = 100;
+    private const int DESTYOY_CONUT = 100;
     
     #endregion
 
@@ -30,7 +30,7 @@ public class DeletionObj : MonoBehaviour
 
     public void DestyoyObj()
     {
-        if(gameObject.transform.childCount >= DESTYOYCONUT)
+        if(gameObject.transform.childCount >= DESTYOY_CONUT)
         {
             foreach(Transform chlid in _parentTransform)
             {
