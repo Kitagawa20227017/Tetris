@@ -17,6 +17,8 @@ public class UpdateMinoMap : MonoBehaviour
 
     private SortingMino _sortingMino = default;
 
+    private Score _score = default;
+ 
     #region const定数
 
     // ミノオブジェクトタグ
@@ -42,6 +44,9 @@ public class UpdateMinoMap : MonoBehaviour
 
     // クリアライン数
     private const int CLEARLINE = 30;
+
+    // スコアの増加量
+    private const int SCORE_ADD = 1000;
 
     #endregion
 
@@ -74,6 +79,11 @@ public class UpdateMinoMap : MonoBehaviour
         set => _map = value; 
     }
 
+    public int LineDeleted 
+    { 
+        get => _lineDeleted; 
+    }
+
     #endregion
 
     #region メソッド  
@@ -87,6 +97,7 @@ public class UpdateMinoMap : MonoBehaviour
         _deletionObj = GameObject.Find("DeleteObjs").GetComponent<DeletionObj>();
         _gameOver = GameObject.Find("PlayerMap").GetComponent<GameOver>();
         _sortingMino = GameObject.Find("PlayerMap").GetComponent<SortingMino>();
+        _score = GameObject.Find("PlayerMap").GetComponent<Score>();
         _parentTransform = this.gameObject.transform;
 
         // マップの初期設定
@@ -103,9 +114,6 @@ public class UpdateMinoMap : MonoBehaviour
 
         // ミノの出現処理
         _sortingMino.IsAdvent();
-
-        // ゲームクリアの判定処理
-        GameClear();
 
         // ゲームオーバーの判定処理
         GameOver();
@@ -176,7 +184,8 @@ public class UpdateMinoMap : MonoBehaviour
                 _lineDeleted++;
                 _destoyIndex += DELETE_MINO_QTY;           
                 destoryMinoLine[countDestoryMino] = i; 
-                countDestoryMino++;                    
+                countDestoryMino++;
+                _score.ScoreCount += SCORE_ADD;
             }
         }
 
@@ -264,17 +273,6 @@ public class UpdateMinoMap : MonoBehaviour
         if (Map[0, 4] == MINO_OBJ || Map[0, 5] == MINO_OBJ || Map[0, 6] == MINO_OBJ || Map[0, 7] == MINO_OBJ)
         {
             _gameOver.GameOverJudgment();
-        }
-    }
-
-    /// <summary>
-    /// ゲームクリア判定
-    /// </summary>
-    private void GameClear()
-    {
-        if(_lineDeleted >= CLEARLINE)
-        {
-            Debug.Log("Clear");
         }
     }
 

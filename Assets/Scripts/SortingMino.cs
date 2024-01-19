@@ -2,7 +2,7 @@
 // Sortingmino.cs  
 //   
 // 作成日:  2023/11/16
-// 作成者:  
+// 作成者:  北川 稔明
 // ---------------------------------------------------------  
 using UnityEngine;
 using System.Collections.Generic;
@@ -238,6 +238,8 @@ public class SortingMino : MonoBehaviour
         {
             Instantiate(_minoObjs[mino[_indexArray]], _evenNumberSidePos, Quaternion.identity, this.transform);
             _indexArray++;
+
+             // ミノの出現順番変更
             if(_indexArray >= ARRAY_OVER)
             {
                 _indexArray = 0;
@@ -251,6 +253,8 @@ public class SortingMino : MonoBehaviour
         {
             Instantiate(_minoObjs[mino[_indexArray]], _tMinoPos, Quaternion.identity, this.transform);
             _indexArray++;
+
+            // ミノの出現順番変更
             if (_indexArray >= ARRAY_OVER)
             {
                 _indexArray = 0;
@@ -264,6 +268,8 @@ public class SortingMino : MonoBehaviour
         {
             Instantiate(_minoObjs[mino[_indexArray]], _oddNumberSidePos, Quaternion.identity, this.transform);
             _indexArray++;
+
+            // ミノの出現順番変更
             if (_indexArray >= ARRAY_OVER)
             {
                 _indexArray = 0;
@@ -278,6 +284,7 @@ public class SortingMino : MonoBehaviour
         _nextMinoPosX = INITIAL_POS_X;
          _nextMinoPosY = INITIAL_POS_Y;
         int nowNumber = _indexArray;
+
         // ミノの出現予測表示
         for (int i = 0; i < _nextMino.Length; i++)
         {
@@ -290,11 +297,11 @@ public class SortingMino : MonoBehaviour
             {
                 nowNumber = 0;
             }
-            if (i <= ARRAY_NUMBER_BEFORE && mino[nowNumber + 1] == 1)
+            if (i <= ARRAY_NUMBER_BEFORE && mino[nowNumber + 1] == IMINO)
             { 
                  _nextMinoPosY =  _nextMinoPosY - NEXT_MINO_MOVE_FEW;
             }
-            else if(i <= ARRAY_NUMBER_BEFORE && mino[nowNumber + 1] != 1)
+            else if(i <= ARRAY_NUMBER_BEFORE && mino[nowNumber + 1] != IMINO)
             {
                  _nextMinoPosY =  _nextMinoPosY - NEXT_MINO_MOVE_GREAT;
             }

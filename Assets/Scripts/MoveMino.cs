@@ -1,5 +1,5 @@
 // ---------------------------------------------------------  
-// PlayerInput.cs
+// MoveMino.cs
 // 
 // プレイヤーに入力処理及びそれに伴うミノの挙動変化
 // 
@@ -40,13 +40,8 @@ public class MoveMino : MonoBehaviour
     // Iミノの移動処理
     private const int IMINO_MOVE = 2;
 
-    // 外壁から1マス内側の位置
-    
-
-
-    // 外壁から2マス内側の位置
-
-
+    // スコアの増加量
+    private const int SCORE_ADD = 100;
 
     #endregion
 
@@ -56,13 +51,16 @@ public class MoveMino : MonoBehaviour
     // UpdateMinoMapスクリプト取得用
     private UpdateMinoMap _updateMap = default;
 
+    // 
+    private Score _score = default;
+
     // 子オブジェクト取得用
     private Transform _parentTransform = default;
 
-    // 
+    // 右回転
     readonly private Quaternion _rightRotetion = Quaternion.Euler(0, 0, 90);
 
-    // 
+    // 左回転
     readonly private Quaternion _leftRotetion = Quaternion.Euler(0, 0, -90);
 
     // ミノの移動距離
@@ -107,6 +105,7 @@ public class MoveMino : MonoBehaviour
         // オブジェクト、スクリプトの取得、格納
         _mapObj = GameObject.Find("Map").gameObject;
         _updateMap = GameObject.Find("Map").GetComponent<UpdateMinoMap>();
+        _score = GameObject.Find("PlayerMap").GetComponent<Score>();
         _parentTransform = this.gameObject.transform;
         _minoCondition = _minoType.ToString();
         if(_minoCondition == "IMino")
@@ -142,11 +141,52 @@ public class MoveMino : MonoBehaviour
 
         if (Input.GetKey(KeyCode.S))
         {
-            _minoTimer = 0.25f;
+            _minoTimer = 0.1f;
         }
         else
         {
-            _minoTimer = 1f;
+            switch (_updateMap.LineDeleted / 10)
+            {
+                case 0:
+                    _minoTimer = 1f;
+                    break;
+
+                case 1:
+                    _minoTimer = 0.9f;
+                    break;
+
+                case 2:
+                    _minoTimer = 0.8f;
+                    break;
+
+                case 3:
+                    _minoTimer = 0.7f;
+                    break;
+
+                case 4:
+                    _minoTimer = 0.6f;
+                    break;
+
+                case 5:
+                    _minoTimer = 0.6f;
+                    break;
+
+                case 6:
+                    _minoTimer = 0.5f;
+                    break;
+
+                case 7:
+                    _minoTimer = 0.4f;
+                    break;
+
+                case 8:
+                    _minoTimer = 0.3f;
+                    break;
+
+                case 9:
+                    _minoTimer = 0.2f;
+                    break;
+            }
         }
 
         if (Input.GetButtonDown("RightMove") && RotationMino(RIGHT_MOVE_MINO))
@@ -310,7 +350,7 @@ public class MoveMino : MonoBehaviour
         bool isMinoMove = true;
 
         // 回転させる
-        if (transform.localPosition.y < -0.5) // 上にはみ出たらなにもせず返す
+        if (transform.localPosition.y < -0.5) 
         {
             if (moveDirection == RIGHT_MOVE_MINO)
             {
@@ -321,7 +361,7 @@ public class MoveMino : MonoBehaviour
                 gameObject.transform.localRotation = gameObject.transform.localRotation * _leftRotetion;
             }
         }
-        else
+        else // 上にはみ出たらなにもせず返す
         {
             return;
         }
@@ -409,6 +449,7 @@ public class MoveMino : MonoBehaviour
         gameObject.transform.position = new Vector2(100, 100);
         gameObject.transform.parent = _mapObj.transform;
         gameObject.SetActive(false);
+        _score.ScoreCount += SCORE_ADD;
     }
 
     #endregion
