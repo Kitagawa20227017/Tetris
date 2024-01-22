@@ -12,6 +12,9 @@ public class GameOver : MonoBehaviour
 
     #region 変数
 
+    [SerializeField] private GameObject _gameOverUI;
+    [SerializeField] private GameObject _textUI;
+    [SerializeField] private GameObject _map;
     private bool _isFin = false; 
 
     #endregion
@@ -27,9 +30,18 @@ public class GameOver : MonoBehaviour
     #endregion
 
 
+    private void Start()
+    {
+        _gameOverUI.SetActive(false);
+        _textUI.SetActive(false);
+    }
+
     public void GameOverJudgment()
     {
         gameObject.SetActive(false);
+        _map.SetActive(false);
+        _gameOverUI.SetActive(true);
+        _textUI.SetActive(true);
         _isFin = true;
     }
 }

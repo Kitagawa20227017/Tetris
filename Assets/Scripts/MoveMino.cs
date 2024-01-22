@@ -75,6 +75,8 @@ public class MoveMino : MonoBehaviour
     // ミノの落ちてくる時間を測るタイマー
     private float _downMinoTimer = 0;
 
+
+
     // ミノの形の識別
     private enum Mino
     {
@@ -119,32 +121,20 @@ public class MoveMino : MonoBehaviour
     /// </summary>  
     void Update()
     {
-        // 時間を測る
-        _downMinoTimer += Time.deltaTime;
-        if (_downMinoTimer >= _minoTimer)
-        {
-            if (DownMove())
-            {
-                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVE_MINO);
-            }
-            else
-            {
-                StopMino();
-            }
-            _downMinoTimer = 0;
-        }
-
+        // ハードドロップ
         if (Input.GetButtonDown("HardDrop"))
         {
             HardDorp();
         }
 
-        if (Input.GetKey(KeyCode.S))
+        // 高速落下
+        if (Input.GetButtonDown("UpSpeed"))
         {
             _minoTimer = 0.1f;
         }
         else
         {
+            // 消したラインが多くなるほど落下が早くなる
             switch (_updateMap.LineDeleted / 10)
             {
                 case 0:
@@ -189,6 +179,7 @@ public class MoveMino : MonoBehaviour
             }
         }
 
+        // 左右移動
         if (Input.GetButtonDown("RightMove") && RotationMino(RIGHT_MOVE_MINO))
         {
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x + MOVE_MINO, gameObject.transform.localPosition.y);
@@ -198,6 +189,7 @@ public class MoveMino : MonoBehaviour
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x - MOVE_MINO, gameObject.transform.localPosition.y);
         }
 
+        // 回転
         if (Input.GetButtonDown("LeftRotation"))
         {
             MinoRevolution(LEFT_MOVE_MINO);
@@ -208,10 +200,28 @@ public class MoveMino : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        // 時間を測る
+        _downMinoTimer += Time.deltaTime;
+        if (_downMinoTimer >= _minoTimer)
+        {
+            if (DownMove())
+            {
+                gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVE_MINO);
+            }
+            else
+            {
+                StopMino();
+            }
+            _downMinoTimer = 0;
+        }
+    }
+
     /// <summary>
     /// ミノの左右移動処理
     /// </summary>
-    /// <param name="moveDirection"></param>
+    /// <param name="moveDirection">左右の移動方向</param>
     /// <returns>左右移動判定結果</returns>
     private bool RotationMino(string moveDirection)
     {
@@ -224,9 +234,10 @@ public class MoveMino : MonoBehaviour
             // 見つけた子オブジェクトのローカル座標を保存
             int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
-
+            // 左右どちらか判定
             if (moveDirection == RIGHT_MOVE_MINO)
             {
+                // 1マス横に判定
                 if (_updateMap.Map[verticalAxis, horizontalAxis + 1] == 0)
                 {
                     isMinoMove = true;
@@ -239,6 +250,7 @@ public class MoveMino : MonoBehaviour
             }
             else if (moveDirection == LEFT_MOVE_MINO)
             {
+                // 1マス横に判定
                 if (_updateMap.Map[verticalAxis, horizontalAxis - 1] == 0)
                 {
                     isMinoMove = true;
@@ -267,6 +279,7 @@ public class MoveMino : MonoBehaviour
             // 見つけた子オブジェクトのローカル座標を保存
             int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
+            // 1マス下の判定
             if (_updateMap.Map[verticalAxis + 1, horizontalAxis] == 0)
             {
                 isMinoMove = true;
@@ -292,6 +305,7 @@ public class MoveMino : MonoBehaviour
             // 見つけた子オブジェクトのローカル座標を保存
             int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
+            // 1マス下が何か判定
             if (_updateMap.Map[verticalAxis + 1, horizontalAxis] == 0)
             {
                 isMinoMove = true;
@@ -305,11 +319,13 @@ public class MoveMino : MonoBehaviour
 
         if (isMinoMove)
         {
+            // 何もなかったら1マス下に移動しもう一回呼ぶ
             gameObject.transform.localPosition = new Vector2(gameObject.transform.localPosition.x, gameObject.transform.localPosition.y - MOVE_MINO);
             HardDorp();
         }
         else
         {
+            // あったら止める
             StopMino();
         }
     }
@@ -327,8 +343,10 @@ public class MoveMino : MonoBehaviour
             // 見つけた子オブジェクトのローカル座標を保存
             int verticalAxis = Mathf.CeilToInt(-localMinoPos.y);
             int horizontalAxis = Mathf.CeilToInt(localMinoPos.x);
+            // 範囲外または何かあるかを判定
             if(horizontalAxis >= MAP_SIDE_MAX || horizontalAxis <= MAP_SIDE_MIN || _updateMap.Map[verticalAxis, horizontalAxis] != 0)
             {
+                // 条件にあったら抜けてreturn
                 isMinoMove = false;
                 return isMinoMove;
             }
@@ -446,9 +464,11 @@ public class MoveMino : MonoBehaviour
                 chlid.gameObject.transform.parent = _mapObj.transform;
             }
         }
+        // オブジェクトの移動
         gameObject.transform.position = new Vector2(100, 100);
         gameObject.transform.parent = _mapObj.transform;
         gameObject.SetActive(false);
+        // スコアの増加
         _score.ScoreCount += SCORE_ADD;
     }
 
